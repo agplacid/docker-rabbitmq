@@ -11,6 +11,8 @@ link_erlang_cookie() {
     if [ -f '/etc/secrets/erlang/cookie' ]; then
         echo "Linking Erlang Cookie"
         ln -sf /etc/secrets/erlang/cookie ~/.erlang.cookie
+        chown rabbitmq:rabbitmq ~/.erlang.cookie
+        chmod 0600 ~/.erlang.cookie
     else
         echo "*** No Erlang Cookie Mounted! ***"
     fi

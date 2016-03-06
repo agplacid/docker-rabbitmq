@@ -48,7 +48,7 @@ run:
 	@docker run -it --rm --name $(NAME) $(LOCAL_TAG)
 
 launch:
-	@docker run -d --name $(NAME) $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -e AUTOCLUSTER_TYPE $(LOCAL_TAG)
 
 logs:
 	@docker logs $(NAME)

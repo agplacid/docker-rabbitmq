@@ -13,10 +13,11 @@ spec:
   containers:
     - name: rabbitmq
       image: callforamerica/rabbitmq
+      imagePullPolicy: Always
       volumeMounts:
-        name: erlang-cookie-secret
-        readOnly: true
-        mountPath: /etc/secrets/erlang
+        - name: erlang-cookie-secret
+          readOnly: true
+          mountPath: /etc/secrets/erlang
     - name: epmd
       image: callforamerica/epmd
     - name: dns
