@@ -1,0 +1,23 @@
+kind: Pod
+apiVersion: v1
+metadata:
+  name: rabbitmq
+  labels:
+    app: rabbitmq
+    role: message-bus
+spec:
+  volumes:
+    - name: erlang-cookie-secret
+      secret:
+        secretName: erlang-cookie
+  containers:
+    - name: rabbitmq
+      image: callforamerica/rabbitmq
+      volumeMounts:
+        name: erlang-cookie-secret
+        readOnly: true
+        mountPath: /etc/secrets/erlang
+    - name: epmd
+      image: callforamerica/epmd
+    - name: dns
+      image: callforamerica/go-dnsmasq

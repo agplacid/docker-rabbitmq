@@ -1,0 +1,89 @@
+#!/bin/bash
+
+# When this exits, exit all back ground process also.
+trap 'kill $(jobs -p)' EXIT
+
+# Die on error
+set -e
+
+# FUNCTIONS
+link_erlang_cookie() {
+    if [ -f '/etc/secrets/erlang/cookie' ]; then
+        echo "Linking Erlang Cookie"
+        ln -sf /etc/secrets/erlang/cookie ~/.erlang.cookie
+    else
+        echo "*** No Erlang Cookie Mounted! ***"
+    fi
+}
+
+get_etcd_host() {
+    local HOST=$(dig +short +search etcd-client)
+    echo -n $HOST
+}
+
+get_etcd_port() {
+    local PORT=$(dig +short +search SRV _etcd-client-port._tcp.etcd-client | awk '{print $3}')
+    echo -n $PORT
+}
+
+# # If long & short hostnames are not the same, use long hostnames
+# if ! [[ "$(hostname)" == "$(hostname -s)" ]]; then
+#     export RABBITMQ_USE_LONGNAME=true
+# fi
+
+if ! [[ -z ${SSL_CERT_FILE+x} ]]; then
+    use_ssl="yes"
+    sed -i "s,CERTFILE,$SSL_CERT_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
+fi
+
+if ! [[ -z ${SSL_KEY_FILE+x} ]]; then
+    use_ssl="yes"
+    sed -i "s,KEYFILE,$SSL_KEY_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
+fi
+
+if ! [[ -z ${SSL_CA_FILE+x} ]]; then
+    use_ssl="yes"
+    sed -i "s,CAFILE,$SSL_CA_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
+fi
+
+if ! [[ -z ${AUTOCLUSTER_TYPE+x} ]]; then
+    rabbitmq-plugins enable --offline autocluster
+
+    etcd_host=$(get_etcd_host)
+    etcd_port=$(get_etcd_port)
+    echo "etcd-addr: $etcd_host  etcd-port: $etcd_port"
+    
+    export ETCD_HOST=$etcd_host 
+    export ETCD_PORT=$etcd_port
+fi
+
+if [[ "${use_ssl}" == "yes" ]]; then
+    mkdir -p /opt || true
+    # Create combined cert
+    cat ${SSL_CERT_FILE} ${SSL_KEY_FILE} > /opt/combined.pem
+    chmod 0400 /opt/combined.pem
+
+    # More ENV vars for make clustering happiness
+    # we don't handle clustering in this script, but these args should ensure
+    # clustered SSL-enabled members will talk nicely
+    export ERL_SSL_PATH="/usr/lib/erlang/lib/ssl-7.1/ebin"
+    export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS} -pa ${ERL_SSL_PATH} -proto_dist inet_tls -ssl_dist_opt server_certfile /opt/combined.pem -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true"
+    export RABBITMQ_CTL_ERL_ARGS="-pa ${ERL_SSL_PATH} -proto_dist inet_tls -ssl_dist_opt server_certfile /opt/combined.pem -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true"
+
+    echo "Launching RabbitMQ with SSL..."
+    echo -e " - SSL_CERT_FILE: $SSL_CERT_FILE\n - SSL_KEY_FILE: $SSL_KEY_FILE\n - SSL_CA_FILE: $SSL_CA_FILE"
+    # mv ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config \
+    #     ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+    ln -sf ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+else
+    echo "Launching RabbitMQ..."
+    ln -sf ${RABBITMQ_HOME}/etc/rabbitmq/standard.config ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+    # mv ${RABBITMQ_HOME}/etc/rabbitmq/standard.config \
+        # ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+fi
+
+echo "linking erlang cookie"
+link_erlang_cookie
+
+cd ~
+    exec rabbitmq-server
