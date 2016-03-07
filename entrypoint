@@ -29,6 +29,11 @@ get_etcd_port() {
     echo -n $PORT
 }
 
+kubernetes_hostname_fix() {
+    echo $(hostname -i) | sed 's/\./-/g'
+
+}
+
 # # If long & short hostnames are not the same, use long hostnames
 # if ! [[ "$(hostname)" == "$(hostname -s)" ]]; then
 #     export RABBITMQ_USE_LONGNAME=true
@@ -87,6 +92,13 @@ fi
 
 echo "linking erlang cookie"
 link_erlang_cookie
+
+if [ -n "$KUBERNETES_HOSTNAME_FIX" ]; then
+    export RABBITMQ_USE_LONGNAME=true
+    
+    ln -sf /srv/rabbitmq/sbin/hostname-fix /srv/rabbitmq/sbin/hostname
+    export HOSTNAME=$(/srv/rabbitmq/sbin/hostname-fix -f)
+fi
 
 cd ~
     exec rabbitmq-server

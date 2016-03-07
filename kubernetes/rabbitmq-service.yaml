@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata: 
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+    project: valuphone
+  ports:
+    - name: amqp
+      protocol: TCP
+      port: 5672
+    - name: admin
+      protocol: TCP
+      port: 15672

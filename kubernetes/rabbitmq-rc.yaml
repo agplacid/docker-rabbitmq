@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 3
+  selector:
+    app: rabbitmq
+    project: valuphone
+  template:
+    metadata:
+      name: rabbitmq
+      labels:
+        app: rabbitmq
+        project: valuphone
+    spec:
+      volumes:
+        - name: erlang-cookie-secret
+          secret:
+            secretName: erlang-cookie
+      containers:
+        - name: rabbitmq
+          image: callforamerica/rabbitmq
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: erlang-cookie-secret
+              readOnly: true
+              mountPath: /etc/secrets/erlang
+          ports:
+            - name: amqp
+              protocol: TCP
+              containerPort: 5672
+            - name: admin
+              protocol: TCP
+              containerPort: 15672
+        - name: epmd
+          image: callforamerica/epmd
+        - name: dns
+          image: callforamerica/go-dnsmasq
+      restartPolicy: Always

@@ -22,7 +22,7 @@ ENV     RABBITMQ_HOME=/srv/rabbitmq \
         RABBITMQ_MNESIA_BASE=/var/lib/rabbitmq
 
 ENV     HOME=$RABBITMQ_HOME \
-        PATH=$PATH:$RABBITMQ_HOME/sbin
+        PATH=$RABBITMQ_HOME/sbin:$PATH
 
 COPY    setup.sh /tmp/setup.sh
 COPY    entrypoint /usr/bin/entrypoint
@@ -35,7 +35,8 @@ ENV     RABBITMQ_LOGS=- \
         RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="+A128 +P 1048576 -kernel inet_dist_listen_min 11500 inet_dist_listen_max 11999"
 
 ENV     AUTOCLUSTER_TYPE=etcd \
-        CLUSTER_NAME=rabbitmq
+        CLUSTER_NAME=rabbitmq \
+        KUBERNETES_HOSTNAME_FIX=true
 
 VOLUME  ["/var/lib/rabbitmq"]
 
