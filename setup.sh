@@ -110,13 +110,13 @@ tee /srv/rabbitmq/sbin/hostname-fix <<EOF
 fqdn() {
     local IP=\$(/bin/hostname -i | sed 's/\./-/g')
     local DOMAIN=\$(cat /etc/resolv.conf | grep search | awk '{print $2}' | sed 's/svc/pod/')
-    echo -n "\${IP}.\${DOMAIN}"
+    echo "\${IP}.\${DOMAIN}"
 }
 
 short() {
     local IP=\$(/bin/hostname -i | sed 's/\./-/g')
     local DOMAIN=\$(cat /etc/resolv.conf | grep search | awk '{print $2}' | sed 's/svc/pod/' | cut -d. -f1-2)
-    echo -n "\${IP}.\${DOMAIN}"
+    echo "\${IP}.\${DOMAIN}"
 }
 
 ip() {
@@ -133,6 +133,7 @@ else
     short
 fi
 EOF
+chmod +x /srv/rabbitmq/sbin/hostname-fix
 
 echo "Cleaning up ..."
 apk del --purge tar xz 

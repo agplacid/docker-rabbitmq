@@ -25,9 +25,9 @@ ENV     HOME=$RABBITMQ_HOME \
         PATH=$RABBITMQ_HOME/sbin:$PATH
 
 COPY    setup.sh /tmp/setup.sh
-COPY    entrypoint /usr/bin/entrypoint
-
 RUN     /tmp/setup.sh
+
+COPY    entrypoint /usr/bin/entrypoint
 
 ENV     RABBITMQ_LOGS=- \
         RABBITMQ_SASL_LOGS=- \

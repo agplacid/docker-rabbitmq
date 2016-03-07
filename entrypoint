@@ -102,3 +102,5 @@ fi
 
 cd ~
     exec rabbitmq-server
+
+tail -f /dev/null
