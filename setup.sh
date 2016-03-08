@@ -103,31 +103,30 @@ tee /srv/rabbitmq/etc/rabbitmq/standard.config <<EOF
 ].
 EOF
 
-echo "Writing Hostname override ..."
-tee /srv/rabbitmq/sbin/hostname-fix <<EOF
+echo "Writing Hostname override fix ..."
+tee /srv/rabbitmq/sbin/hostname-fix <<'EOF'
 #!/bin/bash
 
 fqdn() {
-    local IP=\$(/bin/hostname -i | sed 's/\./-/g')
-    local DOMAIN=\$(cat /etc/resolv.conf | grep search | awk '{print $2}' | sed 's/svc/pod/')
-    echo "\${IP}.\${DOMAIN}"
+    local IP=$(/bin/hostname -i | sed 's/\./-/g')
+    local DOMAIN='default.pod.cluster.local'
+    echo "${IP}.${DOMAIN}"
 }
 
 short() {
-    local IP=\$(/bin/hostname -i | sed 's/\./-/g')
-    local DOMAIN=\$(cat /etc/resolv.conf | grep search | awk '{print $2}' | sed 's/svc/pod/' | cut -d. -f1-2)
-    echo "\${IP}.\${DOMAIN}"
+    local IP=$(/bin/hostname -i | sed 's/\./-/g')
+    echo $IP
 }
 
 ip() {
     /bin/hostname -i
 }
 
-if [[ "\$1" == "-f" ]]; then
+if [[ "$1" == "-f" ]]; then
     fqdn
-elif [[ "\$1" == "-s" ]]; then
+elif [[ "$1" == "-s" ]]; then
     short
-elif [[ "\$1" == "-i" ]]; then
+elif [[ "$1" == "-i" ]]; then
     ip
 else
     short
