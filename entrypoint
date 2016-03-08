@@ -101,7 +101,4 @@ if [ -n "$KUBERNETES_HOSTNAME_FIX" ]; then
 fi
 
 cd ~
-    rabbitmq-server
-    # rabbitmq-server
-
-# tail -f /dev/null
+    su rabbitmq -c 'exec rabbitmq-server'
