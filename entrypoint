@@ -94,14 +94,14 @@ echo "linking erlang cookie"
 link_erlang_cookie
 
 if [ -n "$KUBERNETES_HOSTNAME_FIX" ]; then
-    # export RABBITMQ_USE_LONGNAME=true
     echo "Applying kubernetes hostname fix"
     ln -sf /srv/rabbitmq/sbin/hostname-fix /srv/rabbitmq/sbin/hostname
     export HOSTNAME=$(/srv/rabbitmq/sbin/hostname-fix)
+    echo "127.0.0.1    $HOSTNAME" >> /etc/hosts
 fi
 
 cd ~
-    exec rabbitmq-server
+    rabbitmq-server
     # rabbitmq-server
 
-tail -f /dev/null
+# tail -f /dev/null

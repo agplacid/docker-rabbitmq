@@ -42,7 +42,7 @@ VOLUME  ["/var/lib/rabbitmq"]
 
 EXPOSE  4369 5671 5672 15671 11500-11999 15672 61613
 
-USER    rabbitmq
+# USER    rabbitmq
 
 WORKDIR /srv/rabbitmq
 
