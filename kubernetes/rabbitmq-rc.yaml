@@ -33,8 +33,6 @@ spec:
             - name: admin
               protocol: TCP
               containerPort: 15672
-        - name: epmd
-          image: callforamerica/epmd
         - name: dns
           image: callforamerica/go-dnsmasq
       restartPolicy: Always
