@@ -139,7 +139,7 @@ tee ~/.bashrc <<'EOF'
 #!/bin/bash
 
 if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
-    if [ "$BIGCOUCH_USE_LONGNAME" == true ]; then
+    if [ "$RABBITMQ_USE_LONGNAME" == true ]; then
         export HOSTNAME=$(hostname -f)
     else
         export HOSTNAME=$(hostname)
