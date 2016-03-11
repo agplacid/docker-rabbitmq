@@ -36,8 +36,7 @@ ENV     RABBITMQ_LOGS=- \
 
 ENV     AUTOCLUSTER_TYPE=etcd \
         CLUSTER_NAME=rabbitmq \
-        KUBERNETES_HOSTNAME_FIX=true \
-        WAIT_ON_EPMD=true
+        KUBERNETES_HOSTNAME_FIX=true
 
 VOLUME  ["/var/lib/rabbitmq"]
 
