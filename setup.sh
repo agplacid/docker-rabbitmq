@@ -136,8 +136,6 @@ chmod +x /srv/rabbitmq/sbin/hostname-fix
 
 chown rabbitmq:rabbitmq /bin/hostname /etc/hosts
 
-echo "dir ls for /etc/hosts"
-ls -la /etc/hosts
 
 echo "Cleaning up ..."
 apk del --purge tar xz 

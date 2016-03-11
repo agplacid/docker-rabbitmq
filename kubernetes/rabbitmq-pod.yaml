@@ -4,6 +4,7 @@ metadata:
   name: rabbitmq
   labels:
     app: rabbitmq
+    project: valuphone
     role: message-bus
 spec:
   volumes:
@@ -18,7 +19,15 @@ spec:
         - name: erlang-cookie-secret
           readOnly: true
           mountPath: /etc/secrets/erlang
+      ports:
+        - name: amqp
+          protocol: TCP
+          containerPort: 5672
+        - name: admin
+          protocol: TCP
+          containerPort: 15672
     - name: epmd
       image: callforamerica/epmd
     - name: dns
       image: callforamerica/go-dnsmasq
+  restartPolicy: Always

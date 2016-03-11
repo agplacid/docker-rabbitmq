@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # When this exits, exit all back ground process also.
-trap 'kill $(jobs -p)' EXIT
+# trap 'kill $(jobs -p)' EXIT
 
 # Die on error
 # set -e
@@ -33,6 +33,17 @@ kubernetes_hostname_fix() {
     echo $(hostname -i) | sed 's/\./-/g'
 
 }
+
+if [ -n "$WAIT_ON_EPMD" ]; then
+    # wait for EPMD to be up
+    echo "Testing if EPMD is up ..."
+    while [ ! $(epmd -names | head -n 1 | awk '{print $2}') == 'up' ]; do
+        echo "Waiting on EPMD ..." 
+        sleep 10
+    done
+    echo "epmd status: $(epmd -names | head -n 1 | awk '{print $2}')"
+    epmd -names
+fi
 
 # # If long & short hostnames are not the same, use long hostnames
 # if ! [[ "$(hostname)" == "$(hostname -s)" ]]; then
