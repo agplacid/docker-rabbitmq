@@ -50,6 +50,9 @@ run:
 launch:
 	@docker run -d --name $(NAME) -e AUTOCLUSTER_TYPE $(LOCAL_TAG)
 
+wait:
+	@docker run -d --name $(NAME) -e AUTOCLUSTER_TYPE -e WAIT_ON_EPMD=true $(LOCAL_TAG)
+	$(MAKE) logsf
 logs:
 	@docker logs $(NAME)
 
