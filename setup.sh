@@ -42,17 +42,14 @@ cd /srv
 		rabbitmq-plugins enable --offline rabbitmq_management
 		
 		echo "Downloading RabbitMQ Autocluster ..."
-		rmq_ac_url=https://github.com/aweber/rabbitmq-autocluster/releases/download
+		rmq_ac_url=https://github.com/sip-li/rabbitmq-autocluster/releases/download
 		rmq_ac_url=${rmq_ac_url}/${RABBITMQ_AUTOCLUSTER_PLUGIN_VERSION}
 		rmq_ac_url=${rmq_ac_url}/autocluster-${RABBITMQ_AUTOCLUSTER_PLUGIN_VERSION}.ez
 
 		curl -sSL -o ${PLUGINS_DIR}/autocluster-${RABBITMQ_AUTOCLUSTER_PLUGIN_VERSION}.ez $rmq_ac_url
 
 		echo "Setting Ownership & Permissions ..."
-		chown -R rabbitmq:rabbitmq $RABBITMQ_HOME
-		chown -R rabbitmq:rabbitmq $RABBITMQ_MNESIA_BASE
-		chown rabbitmq:rabbitmq /usr/bin/entrypoint
-		chmod a+x /usr/bin/entrypoint
+		chown -R rabbitmq:rabbitmq $RABBITMQ_HOME $RABBITMQ_MNESIA_BASE
 
 echo "Writing SSL Rabbit Config ..."
 tee /srv/rabbitmq/etc/rabbitmq/ssl.config <<EOF
@@ -147,8 +144,6 @@ if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
 fi
 EOF
 chown rabbitmq:rabbitmq ~/.bashrc
-
-chown rabbitmq:rabbitmq /bin/hostname /etc/hosts
 
 
 echo "Cleaning up ..."

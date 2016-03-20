@@ -14,7 +14,7 @@ LABEL   app.name="rabbitmq" \
         autocluster.version="0.4.1"
 
 ENV     RABBITMQ_VERSION=3.6.0 \
-        RABBITMQ_AUTOCLUSTER_PLUGIN_VERSION=0.4.1
+        RABBITMQ_AUTOCLUSTER_PLUGIN_VERSION=master
 
 ENV     RABBITMQ_HOME=/srv/rabbitmq \
         PLUGINS_DIR=/srv/rabbitmq/plugins \
@@ -40,7 +40,7 @@ ENV     AUTOCLUSTER_TYPE=etcd \
 
 VOLUME  ["/var/lib/rabbitmq"]
 
-EXPOSE  4369 5671 5672 15671 11500-11999 15672 61613
+EXPOSE  4369 5671 5672 15671 11500-11999 15672
 
 # USER    rabbitmq
 
