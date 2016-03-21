@@ -26,6 +26,30 @@ spec:
         - name: admin
           protocol: TCP
           containerPort: 15672
+      resources:
+        requests:
+          cpu: 1
+          memory: 1G
+        limits:
+          cpu: 1
+          memory: 1G
+      readinessProbe:
+        tcpSocket:
+          port: 5672
+        initialDelaySeconds: 30
+        timeoutSeconds: 5
+      livenessProbe:
+        exec:
+          command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
+        initialDelaySeconds: 30
+        timeoutSeconds: 10
     - name: dns
       image: callforamerica/go-dnsmasq
+      resources:
+        requests: 
+          cpu: 100m
+          memory: 25Mi
+        limits:
+          cpu: 100m
+          memory: 25Mi
   restartPolicy: Always

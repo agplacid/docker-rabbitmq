@@ -5,18 +5,7 @@ AMQP Message Bus dockerized, for use in a kubernetes pod.  The only two plugins 
 
 ## Issues
 
-### 1. When using the etcd backend for autocluster, there is a preceding / in the hostname. 
-
-```
-autocluster: Can not communicate with cluster nodes: ['rabbit@/hostname']
-```
-
-This issue has been fixed, but the most current release of the plugin does not reflect the fix.  Attempting to compile the plugin from the repo was not successful, but it could totally be my fault?
-
-Reference: [https://github.com/aweber/rabbitmq-autocluster/issues/52](Issue #52)
-
-
-### 2. Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS. 
+### 1. Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS. 
 
 The hack I've done to work around this requires root privileges at runtime, effectively breaking the ability to set a non root user in the dockerfile.  `USER rabbitmq` has been commented out in the dockerfile for this reason.
 
