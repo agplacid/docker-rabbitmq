@@ -1,12 +1,12 @@
 kind: Service
 apiVersion: v1
 metadata: 
-  name: rabbitmq-noac
+  name: rabbitmq
 spec:
   selector:
     app: rabbitmq
     project: valuphone
-    autocluster: disabled
+    autocluster: enabled
   ports:
     - name: amqp
       protocol: TCP
