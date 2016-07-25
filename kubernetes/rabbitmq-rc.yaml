@@ -1,20 +1,18 @@
 apiVersion: v1
 kind: ReplicationController
 metadata:
-  name: rabbitmq-noac
+  name: rabbitmq
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     app: rabbitmq
     project: valuphone
-    autocluster: disabled
   template:
     metadata:
       name: rabbitmq
       labels:
         app: rabbitmq
         project: valuphone
-        autocluster: disabled
         role: message-bus
     spec:
       volumes:
@@ -29,9 +27,6 @@ spec:
             - name: erlang-cookie-secret
               readOnly: true
               mountPath: /etc/secrets/erlang
-          env:
-            - name: AUTOCLUSTER_TYPE
-              value: ''
           ports:
             - name: amqp
               protocol: TCP
@@ -49,13 +44,13 @@ spec:
           readinessProbe:
             tcpSocket:
               port: 5672
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
+            initialDelaySeconds: 60
+            timeoutSeconds: 15
           livenessProbe:
             exec:
               command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
-            initialDelaySeconds: 30
-            timeoutSeconds: 10
+            initialDelaySeconds: 60
+            timeoutSeconds: 30
         - name: dns
           image: callforamerica/go-dnsmasq
           resources:

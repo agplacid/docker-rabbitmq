@@ -10,13 +10,16 @@
 link_erlang_cookie() {
     if [ -f '/etc/secrets/erlang/cookie' ]; then
         echo "Linking Erlang Cookie"
-        yes | cp -rf /etc/secrets/erlang/cookie ~/.erlang.cookie
+        cookie=$(cat /etc/secrets/erlang/cookie)
+        # yes | cp -rf /etc/secrets/erlang/cookie ~/.erlang.cookie
         # ln -sf /etc/secrets/erlang/cookie ~/.erlang.cookie
-        chown rabbitmq:rabbitmq ~/.erlang.cookie
-        chmod 0600 ~/.erlang.cookie
     else
         echo "*** No Erlang Cookie Mounted! ***"
+        cookie=insecure-cookie
     fi
+    echo "$cookie" > ~/.erlang.cookie
+    chown rabbitmq:rabbitmq ~/.erlang.cookie
+    chmod 0600 ~/.erlang.cookie
 }
 
 get_etcd_host() {
