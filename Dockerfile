@@ -34,9 +34,10 @@ ENV     RABBITMQ_LOGS=- \
         RABBITMQ_USE_LONGNAME=false \
         RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="+A128 +P 1048576 -kernel inet_dist_listen_min 11500 inet_dist_listen_max 11999"
 
-ENV     AUTOCLUSTER_TYPE=etcd \
-        CLUSTER_NAME=rabbitmq \
-        KUBERNETES_HOSTNAME_FIX=true
+ENV     KUBERNETES_HOSTNAME_FIX=true
+#         AUTOCLUSTER_TYPE=etcd \
+#         CLUSTER_NAME=rabbitmq \
+        
 
 VOLUME  ["/var/lib/rabbitmq"]
 
