@@ -1,120 +1,61 @@
 #!/bin/bash
 
-# When this exits, exit all back ground process also.
-# trap 'kill $(jobs -p)' EXIT
-
-# Die on error
-# set -e
-
-# FUNCTIONS
-link_erlang_cookie() {
-    if [ -f '/etc/secrets/erlang/cookie' ]; then
-        echo "Linking Erlang Cookie"
-        cookie=$(cat /etc/secrets/erlang/cookie)
-        # yes | cp -rf /etc/secrets/erlang/cookie ~/.erlang.cookie
-        # ln -sf /etc/secrets/erlang/cookie ~/.erlang.cookie
-    else
-        echo "*** No Erlang Cookie Mounted! ***"
-        cookie=insecure-cookie
-    fi
-    echo "$cookie" > ~/.erlang.cookie
-    chown rabbitmq:rabbitmq ~/.erlang.cookie
-    chmod 0600 ~/.erlang.cookie
-}
-
-get_etcd_host() {
-    local HOST=$(dig +short +search etcd-client)
-    echo -n $HOST
-}
-
-get_etcd_port() {
-    local PORT=$(dig +short +search SRV _etcd-client-port._tcp.etcd-client | awk '{print $3}')
-    echo -n $PORT
-}
-
-kubernetes_hostname_fix() {
-    echo $(hostname -i) | sed 's/\./-/g'
-
-}
+RABBITMQ_LOG_LEVEL=${RABBITMQ_LOG_LEVEL:-info}
+RABBITMQ_DISK_FREE_LIMIT=${RABBITMQ_DISK_FREE_LIMIT:-50MB}
+RABBITMQ_VM_MEMORY_HIGH_WATERMARK=${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:-0.8}
 
 
-# if [ -n "$WAIT_ON_EPMD" ]; then
-#     # wait for EPMD to be up
-#     echo "Testing if EPMD is up ..."
-#     while [ "$(epmd -names | head -n 1 | awk '{print $2}')" != "up" ]; do
-#         echo "Waiting on EPMD ..." 
-#         sleep 10
-#     done
-#     echo "epmd status: $(epmd -names | head -n 1 | awk '{print $2}')"
-#     epmd -names
-# fi
+set -e
 
 
-# # If long & short hostnames are not the same, use long hostnames
-# if ! [[ "$(hostname)" == "$(hostname -s)" ]]; then
-#     export RABBITMQ_USE_LONGNAME=true
-# fi
+# log levels: debug info warning error none
+echo "Writing rabbitmq.config ..."
+tee /etc/rabbitmq/rabbitmq.config <<EOF
+[
+{rabbit, [{disk_free_limit, "${RABBITMQ_DISK_FREE_LIMIT}"}
+          ,{vm_memory_high_watermark, ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK}}
+          ,{loopback_users, []}
+          ,{log_levels, [{connection, $(echo $RABBITMQ_LOG_LEVEL | awk '{print tolower($0)}')}]}
+         ]},
+{rabbitmq_management, [{rates_mode, none}]},
+{rabbitmq_management_agent, [{rates_mode, none}]}
+].
+EOF
 
-if ! [[ -z ${SSL_CERT_FILE+x} ]]; then
-    use_ssl="yes"
-    sed -i "s,CERTFILE,$SSL_CERT_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
-fi
 
-if ! [[ -z ${SSL_KEY_FILE+x} ]]; then
-    use_ssl="yes"
-    sed -i "s,KEYFILE,$SSL_KEY_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
-fi
-
-if ! [[ -z ${SSL_CA_FILE+x} ]]; then
-    use_ssl="yes"
-    sed -i "s,CAFILE,$SSL_CA_FILE,g" ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config
-fi
-
-if ! [[ -z ${AUTOCLUSTER_TYPE+x} ]]; then
-    rabbitmq-plugins enable --offline autocluster
-
-    etcd_host=$(get_etcd_host)
-    etcd_port=$(get_etcd_port)
-    echo "etcd-addr: $etcd_host  etcd-port: $etcd_port"
-    
-    export ETCD_HOST=$etcd_host 
-    export ETCD_PORT=$etcd_port
-fi
-
-if [[ "${use_ssl}" == "yes" ]]; then
-    mkdir -p /opt || true
-    # Create combined cert
-    cat ${SSL_CERT_FILE} ${SSL_KEY_FILE} > /opt/combined.pem
-    chmod 0400 /opt/combined.pem
-
-    # More ENV vars for make clustering happiness
-    # we don't handle clustering in this script, but these args should ensure
-    # clustered SSL-enabled members will talk nicely
-    export ERL_SSL_PATH="/usr/lib/erlang/lib/ssl-7.1/ebin"
-    export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="${RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS} -pa ${ERL_SSL_PATH} -proto_dist inet_tls -ssl_dist_opt server_certfile /opt/combined.pem -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true"
-    export RABBITMQ_CTL_ERL_ARGS="-pa ${ERL_SSL_PATH} -proto_dist inet_tls -ssl_dist_opt server_certfile /opt/combined.pem -ssl_dist_opt server_secure_renegotiate true client_secure_renegotiate true"
-
-    echo "Launching RabbitMQ with SSL..."
-    echo -e " - SSL_CERT_FILE: $SSL_CERT_FILE\n - SSL_KEY_FILE: $SSL_KEY_FILE\n - SSL_CA_FILE: $SSL_CA_FILE"
-    # mv ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config \
-    #     ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
-    ln -sf ${RABBITMQ_HOME}/etc/rabbitmq/ssl.config ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+echo "Linking Erlang Cookie ..."
+if [ -f '/etc/secrets/erlang/cookie' ]; then
+    cookie=$(cat /etc/secrets/erlang/cookie)
 else
-    echo "Launching RabbitMQ..."
-    ln -sf ${RABBITMQ_HOME}/etc/rabbitmq/standard.config ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
-    # mv ${RABBITMQ_HOME}/etc/rabbitmq/standard.config \
-        # ${RABBITMQ_HOME}/etc/rabbitmq/rabbitmq.config
+    echo "*** No Erlang Cookie Mounted! ***"
+    cookie=insecure-cookie
 fi
+echo "$cookie" > ~/.erlang.cookie
 
-echo "linking erlang cookie"
-link_erlang_cookie
 
-if [ -n "$KUBERNETES_HOSTNAME_FIX" ]; then
-    echo "Applying kubernetes hostname fix"
-    ln -sf /srv/rabbitmq/sbin/hostname-fix /srv/rabbitmq/sbin/hostname
-    export HOSTNAME=$(/srv/rabbitmq/sbin/hostname-fix)
+if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
+    echo "Applying kubernetes hostname fix ..."
+    ln -sf /opt/rabbitmq/bin/hostname-fix /opt/rabbitmq/bin/hostname
+    if [ "$RABBITMQ_USE_LONGNAME" == true ]; then
+        export HOSTNAME=$(hostname -f)
+    else
+        export HOSTNAME=$(hostname)
+    fi
     echo "127.0.0.1    $HOSTNAME" >> /etc/hosts
+else
+    if [ "$RABBITMQ_USE_LONGNAME" == true ]; then
+        export RABBITMQ_USE_LONGNAME=false
+    fi
 fi
 
+
+echo "Ensuring permissions ..."
+chown rabbitmq:rabbitmq ~/.erlang.cookie
+chmod 0600 ~/.erlang.cookie
+
+echo "Ensuring plugins ..."
+rabbitmq-plugins enable --offline rabbitmq_management
+
+echo "Starting rabbitmq ..."
 cd ~
     su rabbitmq -c 'exec rabbitmq-server'

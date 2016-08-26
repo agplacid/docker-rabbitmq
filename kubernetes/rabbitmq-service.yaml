@@ -6,6 +6,7 @@ spec:
   selector:
     app: rabbitmq
     project: valuphone
+    environment: production
   ports:
     - name: amqp
       protocol: TCP

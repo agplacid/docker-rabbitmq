@@ -1,6 +1,6 @@
-# RabbitMQ w/ Autoclustering Plugin
+# RabbitMQ
 
-AMQP Message Bus dockerized, for use in a kubernetes pod.  The only two plugins are rabbitmq-management and autocluster.  To activate the autocluster plugin, simply set the environment variable: AUTOCLUSTER_TYPE and refer to to documentation for the plugin at the following repository: https://github.com/aweber/rabbitmq-autocluster
+AMQP Message Bus dockerized, for use in a kubernetes pod.  The only plugins is rabbitmq-management.
 
 
 ## Issues

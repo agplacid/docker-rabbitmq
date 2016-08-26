@@ -13,7 +13,7 @@ spec:
         secretName: erlang-cookie
   containers:
     - name: rabbitmq
-      image: callforamerica/rabbitmq
+      image: callforamerica/rabbitmq:centos
       imagePullPolicy: Always
       volumeMounts:
         - name: erlang-cookie-secret
@@ -26,6 +26,13 @@ spec:
         - name: admin
           protocol: TCP
           containerPort: 15672
+      env:
+        - name: KUBERNETES_HOSTNAME_FIX
+          value: 'true'
+        - name: RABBITMQ_USE_LONGNAME
+          value: 'true'
+        - name: RABBITMQ_LOG_LEVEL
+          value: debug
       resources:
         requests:
           cpu: 1
@@ -43,13 +50,4 @@ spec:
           command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
         initialDelaySeconds: 30
         timeoutSeconds: 10
-    - name: dns
-      image: callforamerica/go-dnsmasq
-      resources:
-        requests: 
-          cpu: 100m
-          memory: 25Mi
-        limits:
-          cpu: 100m
-          memory: 25Mi
   restartPolicy: Always

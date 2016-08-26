@@ -1,6 +1,6 @@
 NS = vp
 NAME = rabbitmq
-VERSION = 3.6.0
+VERSION = 3.6.5
 LOCAL_TAG = $(NS)/$(NAME):$(VERSION)
 
 REGISTRY = callforamerica
@@ -45,13 +45,13 @@ shell:
 	@docker exec -ti $(NAME) /bin/ash
 
 run:
-	@docker run -it --rm --name $(NAME) $(LOCAL_TAG)
+	@docker run -it --rm --name $(NAME) --entrypoint=bash $(LOCAL_TAG)
 
 launch:
-	@docker run -d --name $(NAME) -e AUTOCLUSTER_TYPE $(LOCAL_TAG)
+	@docker run -d --name $(NAME) $(LOCAL_TAG)
 
 wait:
-	@docker run -d --name $(NAME) -e AUTOCLUSTER_TYPE -e WAIT_ON_EPMD=true $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -e WAIT_ON_EPMD=true $(LOCAL_TAG)
 	$(MAKE) logsf
 logs:
 	@docker logs $(NAME)
