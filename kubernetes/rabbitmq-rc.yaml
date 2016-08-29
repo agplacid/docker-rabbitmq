@@ -18,7 +18,7 @@ spec:
             secretName: erlang-cookie
       containers:
         - name: rabbitmq
-          image: callforamerica/rabbitmq:centos
+          image: callforamerica/rabbitmq
           imagePullPolicy: Always
           volumeMounts:
             - name: erlang-cookie-secret
