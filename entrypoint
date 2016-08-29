@@ -1,14 +1,35 @@
 #!/bin/bash
 
-RABBITMQ_LOG_LEVEL=${RABBITMQ_LOG_LEVEL:-info}
-RABBITMQ_DISK_FREE_LIMIT=${RABBITMQ_DISK_FREE_LIMIT:-50MB}
-RABBITMQ_VM_MEMORY_HIGH_WATERMARK=${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:-0.8}
-
-
 set -e
 
+. ~/.bashrc
 
 # log levels: debug info warning error none
+: ${RABBITMQ_LOG_LEVEL:=info}
+: ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
+: ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:=0.8}
+
+
+if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
+    echo "Applying kubernetes hostname fix ..."
+
+    if [ -z "$(cat /etc/hosts | grep $HOSTNAME)" ]; then
+        echo "127.0.0.1    $(hostname -f)    $(hostname)" >> /etc/hosts
+        echo "::1    $(hostname -f)    $(hostname)" >> /etc/hosts
+        echo "$(hostname -i | head -n 1)    $(hostname -f)    $(hostname)" >> /etc/hosts
+    fi
+
+    echo "$HOSTNAME" > /etc/hostname
+
+    echo -e "
+    HOSTNAME: $HOSTNAME
+    which: $(which hostname)
+    Container IP: $(hostname -i) 
+    Container Host: $(hostname)
+    Container FQDN: $(hostname -f)"
+fi
+
+
 echo "Writing rabbitmq.config ..."
 tee /etc/rabbitmq/rabbitmq.config <<EOF
 [
@@ -25,37 +46,23 @@ EOF
 
 echo "Linking Erlang Cookie ..."
 if [ -f '/etc/secrets/erlang/cookie' ]; then
-    cookie=$(cat /etc/secrets/erlang/cookie)
+    ERLANG_COOKIE=$(cat /etc/secrets/erlang/cookie)
 else
     echo "*** No Erlang Cookie Mounted! ***"
-    cookie=insecure-cookie
+    ERLANG_COOKIE=insecure-cookie
 fi
-echo "$cookie" > ~/.erlang.cookie
-
-
-if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
-    echo "Applying kubernetes hostname fix ..."
-    ln -sf /opt/rabbitmq/bin/hostname-fix /opt/rabbitmq/bin/hostname
-    if [ "$RABBITMQ_USE_LONGNAME" == true ]; then
-        export HOSTNAME=$(hostname -f)
-    else
-        export HOSTNAME=$(hostname)
-    fi
-    echo "127.0.0.1    $HOSTNAME" >> /etc/hosts
-else
-    if [ "$RABBITMQ_USE_LONGNAME" == true ]; then
-        export RABBITMQ_USE_LONGNAME=false
-    fi
-fi
+echo "$ERLANG_COOKIE" > ~/.erlang.cookie
 
 
 echo "Ensuring permissions ..."
 chown rabbitmq:rabbitmq ~/.erlang.cookie
 chmod 0600 ~/.erlang.cookie
 
-echo "Ensuring plugins ..."
+
+echo "Enabling plugins ..."
 rabbitmq-plugins enable --offline rabbitmq_management
+
 
 echo "Starting rabbitmq ..."
 cd ~
-    su rabbitmq -c 'exec rabbitmq-server'
+    su rabbitmq -c 'exec rabbitmq-server 2>&1'

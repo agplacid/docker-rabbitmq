@@ -25,8 +25,11 @@ COPY    entrypoint /usr/bin/entrypoint
 
 ENV     RABBITMQ_LOGS=- \
         RABBITMQ_SASL_LOGS=- \
-        RABBITMQ_LOG_LEVEL=info \
         RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-kernel inet_dist_listen_min 11500 inet_dist_listen_max 11999 inet_default_connect_options [{nodelay,true}]"        
+
+ENV     ERL_MAX_PORTS=65536
+
+ENV     RABBITMQ_LOG_LEVEL=info
 
 VOLUME  ["/var/lib/rabbitmq"]
 

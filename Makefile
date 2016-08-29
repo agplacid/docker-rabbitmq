@@ -1,6 +1,8 @@
 NS = vp
 NAME = rabbitmq
-VERSION = 3.6.5
+APP_VERSION = 3.6.5
+IMAGE_VERSION = 2.0
+VERSION = $(APP_VERSION)-$(IMAGE_VERSION)
 LOCAL_TAG = $(NS)/$(NAME):$(VERSION)
 
 REGISTRY = callforamerica
@@ -11,9 +13,38 @@ GITHUB_REPO = docker-rabbitmq
 DOCKER_REPO = rabbitmq
 BUILD_BRANCH = master
 
+
 .PHONY: all build test release shell run start stop rm rmi default
 
 all: build
+
+kube-deploy:
+	@kubectl create -f kubernetes/$(NAME)-deployment.yaml --record
+
+kube-deploy-edit:
+	@kubectl edit deployment/$(NAME)
+	$(NAME) kube-rollout-status
+
+kube-deploy-rollback:
+	@kubectl rollout undo deployment/$(NAME)
+
+kube-rollout-status:
+	@kubectl rollout status deployment/$(NAME)
+
+kube-rollout-history:
+	@kubectl rollout history deployment/$(NAME)
+
+kube-delete-deployment:
+	@kubectl delete deployment/$(NAME)
+
+kube-deploy-service:
+	@kubectl create -f kubernetes/$(NAME)-service.yaml
+
+kube-delete-service:
+	@kubectl delete svc $(NAME)
+
+kube-replace-service:
+	@kubectl replace -f kubernetes/$(NAME)-service.yaml
 
 checkout:
 	@git checkout $(BUILD_BRANCH)
@@ -23,7 +54,7 @@ build:
 	$(MAKE) tag
 
 tag:
-	@docker tag -f $(LOCAL_TAG) $(REMOTE_TAG)
+	@docker tag $(LOCAL_TAG) $(REMOTE_TAG)
 
 rebuild:
 	@docker build -t $(LOCAL_TAG) --rm --no-cache .
@@ -35,24 +66,24 @@ commit:
 	@git add -A .
 	@git commit
 
-deploy:
-	@docker push $(REMOTE_TAG)
-
 push:
 	@git push origin master
 
 shell:
-	@docker exec -ti $(NAME) /bin/ash
+	@docker exec -ti $(NAME) /bin/bash
 
 run:
-	@docker run -it --rm --name $(NAME) --entrypoint=bash $(LOCAL_TAG)
+	@docker run -it --rm --name $(NAME) --entrypoint bash $(LOCAL_TAG)
 
 launch:
-	@docker run -d --name $(NAME) $(LOCAL_TAG)
+	@docker run -d -h $(NAME) --name $(NAME) -p "5672:5672" $(LOCAL_TAG)
 
-wait:
-	@docker run -d --name $(NAME) -e WAIT_ON_EPMD=true $(LOCAL_TAG)
-	$(MAKE) logsf
+launch-net:
+	@docker run -d --name $(NAME) -h rabbitmq --network=local $(LOCAL_TAG)
+
+create-network:
+	@docker network create -d bridge local
+
 logs:
 	@docker logs $(NAME)
 
@@ -61,6 +92,9 @@ logsf:
 
 start:
 	@docker start $(NAME)
+
+kill:
+	@docker kill $(NAME)
 
 stop:
 	@docker stop $(NAME)

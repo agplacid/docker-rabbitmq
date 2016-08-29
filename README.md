@@ -13,7 +13,7 @@ Docker by design does not allow you to change the hostname of a container after 
 
 EPMD requires that the environment variable: HOSTNAME and the executable: `env hostname` return a correct and resolvable hostname.
 
-I've fixed this by creating a dummy hostname bash script and place it at the beginning of the path: '/srv/rabbitmq/sbin/hostname-fix'.  In the entrypoint script, if `KUBERNETES_HOSTNAME_FIX` is set, this script is linked at runtime to '/srv/rabbitmq/sbin/hostname', and the environment variable `HOSTNAME` is set correctly, as well as creating an entry in /etc/hosts.  
+I've fixed this by creating a dummy hostname bash script and place it at the beginning of the path: '/opt/rabbitmq/bin/hostname-fix'.  In the entrypoint script, if `KUBERNETES_HOSTNAME_FIX` is set, this script is linked at runtime to '/opt/rabbitmq/bin/hostname', and the environment variable `HOSTNAME` is set correctly, as well as creating an entry in /etc/hosts.  
 
 Only the root user can modify /etc/hosts in a docker container because ownership changes in the build process aren't persisted during container initialization.
 
