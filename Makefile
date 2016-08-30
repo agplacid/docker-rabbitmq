@@ -18,34 +18,6 @@ BUILD_BRANCH = master
 
 all: build
 
-kube-deploy:
-	@kubectl create -f kubernetes/$(NAME)-deployment.yaml --record
-
-kube-deploy-edit:
-	@kubectl edit deployment/$(NAME)
-	$(NAME) kube-rollout-status
-
-kube-deploy-rollback:
-	@kubectl rollout undo deployment/$(NAME)
-
-kube-rollout-status:
-	@kubectl rollout status deployment/$(NAME)
-
-kube-rollout-history:
-	@kubectl rollout history deployment/$(NAME)
-
-kube-delete-deployment:
-	@kubectl delete deployment/$(NAME)
-
-kube-deploy-service:
-	@kubectl create -f kubernetes/$(NAME)-service.yaml
-
-kube-delete-service:
-	@kubectl delete svc $(NAME)
-
-kube-replace-service:
-	@kubectl replace -f kubernetes/$(NAME)-service.yaml
-
 checkout:
 	@git checkout $(BUILD_BRANCH)
 
@@ -105,5 +77,33 @@ rm:
 rmi:
 	@docker rmi $(LOCAL_TAG)
 	@docker rmi $(REMOTE_TAG)
+
+kube-deploy:
+	@kubectl create -f kubernetes/$(NAME)-deployment.yaml --record
+
+kube-deploy-edit:
+	@kubectl edit deployment/$(NAME)
+	$(MAKE) kube-rollout-status
+
+kube-deploy-rollback:
+	@kubectl rollout undo deployment/$(NAME)
+
+kube-rollout-status:
+	@kubectl rollout status deployment/$(NAME)
+
+kube-rollout-history:
+	@kubectl rollout history deployment/$(NAME)
+
+kube-delete-deployment:
+	@kubectl delete deployment/$(NAME)
+
+kube-deploy-service:
+	@kubectl create -f kubernetes/$(NAME)-service.yaml
+
+kube-delete-service:
+	@kubectl delete svc $(NAME)
+
+kube-replace-service:
+	@kubectl replace -f kubernetes/$(NAME)-service.yaml
 
 default: build
