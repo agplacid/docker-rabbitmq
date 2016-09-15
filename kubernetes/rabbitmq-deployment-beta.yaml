@@ -1,14 +1,15 @@
-apiVersion: v1
-kind: ReplicationController
+apiVersion: extensions/v1beta1
+kind: Deployment
 metadata:
-  name: rabbitmq
+  name: rabbitmq-beta
 spec:
   replicas: 1
   template:
     metadata:
-      name: rabbitmq
+      name: rabbitmq-beta
       labels:
         app: rabbitmq
+        set: beta
         project: valuphone
         environment: production
     spec:
@@ -27,8 +28,6 @@ spec:
           env:
             - name: KUBERNETES_HOSTNAME_FIX
               value: 'true'
-            - name: RABBITMQ_USE_LONGNAME
-              value: 'false'
             - name: RABBITMQ_LOG_LEVEL
               value: debug
           ports:
@@ -48,11 +47,11 @@ spec:
           readinessProbe:
             tcpSocket:
               port: 5672
-            initialDelaySeconds: 60
-            timeoutSeconds: 15
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
             exec:
               command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
-            initialDelaySeconds: 60
-            timeoutSeconds: 30
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
       restartPolicy: Always

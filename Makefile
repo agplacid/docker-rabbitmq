@@ -51,7 +51,8 @@ launch:
 	@docker run -d -h $(NAME) --name $(NAME) -p "5672:5672" $(LOCAL_TAG)
 
 launch-net:
-	@docker run -d --name $(NAME) -h rabbitmq --network=local $(LOCAL_TAG)
+	@docker run -d --name $(NAME)-alpha -h rabbitmq-alpha --network=local --net-alias rabbitmq-alpha $(LOCAL_TAG)
+	@docker run -d --name $(NAME)-beta -h rabbitmq-beta --network=local --net-alias rabbitmq-beta $(LOCAL_TAG)
 
 create-network:
 	@docker network create -d bridge local
@@ -79,7 +80,8 @@ rmi:
 	@docker rmi $(REMOTE_TAG)
 
 kube-deploy:
-	@kubectl create -f kubernetes/$(NAME)-deployment.yaml --record
+	@kubectl create -f kubernetes/$(NAME)-deployment-alpha.yaml --record
+	@kubectl create -f kubernetes/$(NAME)-deployment-beta.yaml --record
 
 kube-deploy-edit:
 	@kubectl edit deployment/$(NAME)
@@ -95,15 +97,27 @@ kube-rollout-history:
 	@kubectl rollout history deployment/$(NAME)
 
 kube-delete-deployment:
-	@kubectl delete deployment/$(NAME)
+	@kubectl delete deployment/$(NAME)-alpha
+	@kubectl delete deployment/$(NAME)-beta
 
 kube-deploy-service:
-	@kubectl create -f kubernetes/$(NAME)-service.yaml
+	@kubectl create -f kubernetes/$(NAME)-service-alpha.yaml
+	@kubectl create -f kubernetes/$(NAME)-service-beta.yaml
 
 kube-delete-service:
-	@kubectl delete svc $(NAME)
+	@kubectl delete svc $(NAME)-alpha
+	@kubectl delete svc $(NAME)-beta
 
-kube-replace-service:
-	@kubectl replace -f kubernetes/$(NAME)-service.yaml
+kube-apply-service:
+	@kubectl apply -f kubernetes/$(NAME)-service.yaml
+
+kube-logsf:
+	@kubectl logs -f $(shell kubectl get po | grep $(NAME) | cut -d' ' -f1)
+
+kube-logsft:
+	@kubectl logs -f --tail=25 $(shell kubectl get po | grep $(NAME) | cut -d' ' -f1)
+
+kube-shell:
+	@kubectl exec -ti $(shell kubectl get po | grep $(NAME) | cut -d' ' -f1) -- bash
 
 default: build

@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: rabbitmq
+  name: rabbitmq-alpha
 spec:
   replicas: 1
   template:
@@ -9,10 +9,10 @@ spec:
       name: rabbitmq
       labels:
         app: rabbitmq
+        set: alpha
         project: valuphone
         environment: production
     spec:
-      minReadySeconds: 60
       volumes:
         - name: erlang-cookie-secret
           secret:
@@ -28,8 +28,6 @@ spec:
           env:
             - name: KUBERNETES_HOSTNAME_FIX
               value: 'true'
-            - name: RABBITMQ_USE_LONGNAME
-              value: 'false'
             - name: RABBITMQ_LOG_LEVEL
               value: debug
           ports:
@@ -49,11 +47,11 @@ spec:
           readinessProbe:
             tcpSocket:
               port: 5672
-            initialDelaySeconds: 60
-            timeoutSeconds: 15
+            initialDelaySeconds: 10
+            timeoutSeconds: 10
           livenessProbe:
             exec:
               command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
-            initialDelaySeconds: 60
-            timeoutSeconds: 30
+            initialDelaySeconds: 30
+            timeoutSeconds: 10
       restartPolicy: Always

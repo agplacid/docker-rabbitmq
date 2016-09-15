@@ -1,10 +1,11 @@
 kind: Service
 apiVersion: v1
 metadata: 
-  name: rabbitmq
+  name: rabbitmq-alpha
 spec:
   selector:
     app: rabbitmq
+    set: alpha
     project: valuphone
     environment: production
   ports:
