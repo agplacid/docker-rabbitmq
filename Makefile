@@ -67,13 +67,16 @@ start:
 	@docker start $(NAME)
 
 kill:
-	@docker kill $(NAME)
+	-@docker kill $(NAME)-alpha
+	-@docker kill $(NAME)-beta
 
 stop:
-	@docker stop $(NAME)
+	-@docker stop $(NAME)-alpha
+	-@docker stop $(NAME)-beta
 
 rm:
-	@docker rm $(NAME)
+	-@docker rm $(NAME)-alpha
+	-@docker rm $(NAME)-beta
 
 rmi:
 	@docker rmi $(LOCAL_TAG)
