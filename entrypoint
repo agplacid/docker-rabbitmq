@@ -1,68 +1,54 @@
-#!/bin/bash
+#!/bin/bash -l
 
 set -e
 
-. ~/.bashrc
+app=rabbitmq
+user=$app
 
 # log levels: debug info warning error none
 : ${RABBITMQ_LOG_LEVEL:=info}
 : ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
 : ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:=0.8}
 
+: ${RABBITMQ_DEFAULT_USER:=guest}
+: ${RABBITMQ_DEFAULT_PASS:=guest}
 
-if [ "$KUBERNETES_HOSTNAME_FIX" == true ]; then
-    echo "Applying kubernetes hostname fix ..."
+: ${RABBITMQ_ENABLED_PLUGINS:=rabbitmq_management,rabbitmq_management_agent}
 
-    if [ -z "$(cat /etc/hosts | grep $HOSTNAME)" ]; then
-        echo "127.0.0.1    $(hostname -f)    $(hostname)" >> /etc/hosts
-        echo "::1    $(hostname -f)    $(hostname)" >> /etc/hosts
-        echo "$(hostname -i | head -n 1)    $(hostname -f)    $(hostname)" >> /etc/hosts
-    fi
 
-    echo "$HOSTNAME" > /etc/hostname
-
-    echo -e "
-    HOSTNAME: $HOSTNAME
-    which: $(which hostname)
-    Container IP: $(hostname -i) 
-    Container Host: $(hostname)
-    Container FQDN: $(hostname -f)"
+if [[ $KUBERNETES_HOSTNAME_FIX = true ]]
+then
+    eval $(fix-kube-hostname enable)
 fi
+
+
+echo "Writing erlang cookie ..."
+write-erlang-cookie
 
 
 echo "Writing rabbitmq.config ..."
 tee /etc/rabbitmq/rabbitmq.config <<EOF
 [
-{rabbit, [{disk_free_limit, "${RABBITMQ_DISK_FREE_LIMIT}"}
-          ,{vm_memory_high_watermark, ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK}}
-          ,{loopback_users, []}
-          ,{log_levels, [{connection, $(echo $RABBITMQ_LOG_LEVEL | awk '{print tolower($0)}')}]}
-         ]},
-{rabbitmq_management, [{rates_mode, none}]},
-{rabbitmq_management_agent, [{rates_mode, none}]}
+    {rabbit, [
+        {loopback_users, []},
+        {disk_free_limit, "${RABBITMQ_DISK_FREE_LIMIT}"},
+        {vm_memory_high_watermark, ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK}},
+        {default_user, <<"${RABBITMQ_DEFAULT_USER}">>},
+        {default_pass, <<"${RABBITMQ_DEFAULT_PASS}">>},
+        {log_levels, [{connection, ${RABBITMQ_LOG_LEVEL,,}}]}
+    ]},
+    {rabbitmq_management, [{rates_mode, none}]},
+    {rabbitmq_management_agent, [{rates_mode, none}]}
 ].
 EOF
 
 
-echo "Linking Erlang Cookie ..."
-if [ -f '/etc/secrets/erlang/cookie' ]; then
-    ERLANG_COOKIE=$(cat /etc/secrets/erlang/cookie)
-else
-    echo "*** No Erlang Cookie Mounted! ***"
-    ERLANG_COOKIE=insecure-cookie
-fi
-echo "$ERLANG_COOKIE" > ~/.erlang.cookie
-
-
-echo "Ensuring permissions ..."
-chown rabbitmq:rabbitmq ~/.erlang.cookie
-chmod 0600 ~/.erlang.cookie
-
-
 echo "Enabling plugins ..."
-rabbitmq-plugins enable --offline rabbitmq_management
+# use gosu because rabbitmq-plugins starts epmd as root without
+echo "gosu $user rabbitmq-plugins enable --offline ${RABBITMQ_ENABLED_PLUGINS/,/ }"
 
 
-echo "Starting rabbitmq ..."
+echo "Starting $app ..."
 cd ~
-    su rabbitmq -c 'exec rabbitmq-server 2>&1'
+    export ERL_CRASH_DUMP=$(date +%s)_${app}_crash.dump
+    exec gosu $user rabbitmq-server 2>&1

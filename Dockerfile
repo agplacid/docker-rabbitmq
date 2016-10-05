@@ -1,42 +1,34 @@
-FROM centos:6
+FROM callforamerica/debian
 
 MAINTAINER joe <joe@valuphone.com>
 
-LABEL   os="linux" \
-        os.distro="centos" \
-        os.version="6"
-
 LABEL   lang.name="erlang" \
-        lang.version="19.0.4"
+        lang.version="19.1"
 
 LABEL   app.name="rabbitmq" \
         app.version="3.6.5"
 
-ENV     ERLANG_VERSION=19.0.4 \
+ENV     ERLANG_VERSION=19.1 \
         RABBITMQ_VERSION=3.6.5
 
-ENV     HOME=/opt/rabbitmq
-ENV     PATH=$HOME/bin:$PATH
+ENV     HOME=/var/lib/rabbitmq
 
-COPY    setup.sh /tmp/setup.sh
-RUN     /tmp/setup.sh
+COPY    build.sh /tmp/build.sh
+RUN     /tmp/build.sh
 
-COPY    entrypoint /usr/bin/entrypoint
-
-ENV     RABBITMQ_LOGS=- \
-        RABBITMQ_SASL_LOGS=- \
-        RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-kernel inet_dist_listen_min 11500 inet_dist_listen_max 11999 inet_default_connect_options [{nodelay,true}]"        
+COPY    entrypoint /entrypoint       
 
 ENV     ERL_MAX_PORTS=65536
 
 ENV     RABBITMQ_LOG_LEVEL=info
 
-VOLUME  ["/var/lib/rabbitmq"]
-
-EXPOSE  4369 5672 15672 11500-11999 
+EXPOSE  4369 5672 15672 11500-11999
 
 # USER    rabbitmq
 
-WORKDIR /opt/rabbitmq
+VOLUME  ["/var/lib/rabbitmq/mnesia"]
 
-CMD     ["/usr/bin/entrypoint"]
+WORKDIR /var/lib/rabbitmq
+
+ENTRYPOINT  ["/dumb-init", "--"]
+CMD         ["/entrypoint"]

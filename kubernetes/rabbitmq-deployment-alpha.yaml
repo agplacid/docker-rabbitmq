@@ -6,52 +6,92 @@ spec:
   replicas: 1
   template:
     metadata:
-      name: rabbitmq
       labels:
         app: rabbitmq
         set: alpha
         project: valuphone
         environment: production
     spec:
-      volumes:
-        - name: erlang-cookie-secret
-          secret:
-            secretName: erlang-cookie
       containers:
-        - name: rabbitmq
-          image: callforamerica/rabbitmq
-          imagePullPolicy: Always
-          volumeMounts:
-            - name: erlang-cookie-secret
-              readOnly: true
-              mountPath: /etc/secrets/erlang
-          env:
-            - name: KUBERNETES_HOSTNAME_FIX
-              value: 'true'
-            - name: RABBITMQ_LOG_LEVEL
-              value: debug
-          ports:
-            - name: amqp
-              protocol: TCP
-              containerPort: 5672
-            - name: admin
-              protocol: TCP
-              containerPort: 15672
-          resources:
-            requests:
-              cpu: 1
-              memory: 1G
-            limits:
-              cpu: 1
-              memory: 1G
-          readinessProbe:
-            tcpSocket:
-              port: 5672
-            initialDelaySeconds: 10
-            timeoutSeconds: 10
-          livenessProbe:
-            exec:
-              command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
-            initialDelaySeconds: 30
-            timeoutSeconds: 10
+      - name: rabbitmq
+        image: callforamerica/rabbitmq
+        imagePullPolicy: Always
+        env:
+        - name: KUBERNETES_HOSTNAME_FIX
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: kubernetes.hostname-fix
+        - name: RABBITMQ_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: rabbitmq.log-level
+        - name: RABBITMQ_USE_LONGNAME
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: kubernetes.use-longname
+        - name: RABBITMQ_VM_MEMORY_HIGH_WATERMARK
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: rabbitmq.vm-memory-high-watermark
+        - name: RABBITMQ_ENABLED_PLUGINS
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: rabbitmq.enabled-plugins
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-creds
+              key: rabbitmq.user
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-creds
+              key: rabbitmq.pass
+        - name: ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: erlang-cookie
+              key: erlang.cookie
+        ports:
+        - name: amqp
+          protocol: TCP
+          containerPort: 5672
+        - name: admin
+          protocol: TCP
+          containerPort: 15672
+        volumeMounts:
+        - name: mnesia-ramfs
+          mountPath: /var/lib/rabbitmq/mnesia
+        resources:
+          requests:
+            cpu: 1
+            memory: 1G
+          limits:
+            cpu: 1
+            memory: 1G
+        readinessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        livenessProbe:
+          httpGet: 
+            host: guest:guest@localhost
+            port: admin
+            path: /api/aliveness-test/%2F
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
+          # exec:
+          #   command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
+          # initialDelaySeconds: 30
+          # timeoutSeconds: 10
+      volumes:
+      - name: mnesia-ramfs
+        emptyDir:
+          medium: Memory
       restartPolicy: Always
