@@ -5,6 +5,11 @@ set -e
 app=rabbitmq
 user=$app
 
+if [ -f /etc/default/$app ]
+then
+    . /etc/default/$app
+fi
+
 # log levels: debug info warning error none
 : ${RABBITMQ_LOG_LEVEL:=info}
 : ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
@@ -16,17 +21,24 @@ user=$app
 : ${RABBITMQ_ENABLED_PLUGINS:=rabbitmq_management,rabbitmq_management_agent}
 
 
+function log 
+{
+    local msg="$1"
+    echo -e "\E[36m[*]\E[0m ${msg}" 
+}
+
+
 if [[ $KUBERNETES_HOSTNAME_FIX = true ]]
 then
     eval $(fix-kube-hostname enable)
 fi
 
 
-echo "Writing erlang cookie ..."
+log "Writing erlang cookie ..."
 write-erlang-cookie
 
 
-echo "Writing rabbitmq.config ..."
+log "Writing rabbitmq.config ..."
 tee /etc/rabbitmq/rabbitmq.config <<EOF
 [
     {rabbit, [
@@ -43,12 +55,12 @@ tee /etc/rabbitmq/rabbitmq.config <<EOF
 EOF
 
 
-echo "Enabling plugins ..."
+log "Enabling plugins ..."
 # use gosu because rabbitmq-plugins starts epmd as root without
-echo "gosu $user rabbitmq-plugins enable --offline ${RABBITMQ_ENABLED_PLUGINS/,/ }"
+gosu $user rabbitmq-plugins enable --offline ${RABBITMQ_ENABLED_PLUGINS/,/ }
 
 
-echo "Starting $app ..."
+log "Starting $app ..."
 cd ~
     export ERL_CRASH_DUMP=$(date +%s)_${app}_crash.dump
     exec gosu $user rabbitmq-server 2>&1

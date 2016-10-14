@@ -2,21 +2,21 @@ FROM callforamerica/debian
 
 MAINTAINER joe <joe@valuphone.com>
 
-LABEL   lang.name="erlang" \
-        lang.version="19.1"
+ARG     ERLANG_VERSION
+ARG     RABBITMQ_VERSION
 
-LABEL   app.name="rabbitmq" \
-        app.version="3.6.5"
+ENV     ERLANG_VERSION=${ERLANG_VERSION:-19.1} \
+        RABBITMQ_VERSION=${RABBITMQ_VERSION:-3.6.5}
 
-ENV     ERLANG_VERSION=19.1 \
-        RABBITMQ_VERSION=3.6.5
+LABEL   lang.erlang.version=$ERLANG_VERSION
+LABEL   app.rabbitmq.version=$RABBITMQ_VERSION
 
 ENV     HOME=/var/lib/rabbitmq
 
 COPY    build.sh /tmp/build.sh
 RUN     /tmp/build.sh
 
-COPY    entrypoint /entrypoint       
+COPY    entrypoint /entrypoint
 
 ENV     ERL_MAX_PORTS=65536
 

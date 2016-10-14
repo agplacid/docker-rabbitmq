@@ -11,7 +11,7 @@ eval $(detect-proxy enable)
 
 
 echo "Creating user and group for $user ..."
-useradd --home-dir ~ --create-home --shell /bin/bash --user-group $user
+useradd --system --home-dir ~ --create-home --shell /bin/false --user-group $user
 
 
 echo "Installing essentials ..."
@@ -30,13 +30,14 @@ apt-get update
 
 
 echo "Installing $app ..."
-apt_erlang_version=$(apt-cache show esl-erlang | grep ^Version | grep $ERLANG_VERSION | sort -n | head -1 | awk '{print $2}')
+apt_erlang_version=$(apt-cache show erlang-nox | grep ^Version | grep $ERLANG_VERSION | sort -n | head -1 | awk '{print $2}')
 apt_rabbitmq_version=$(apt-cache show rabbitmq-server | grep ^Version | grep $RABBITMQ_VERSION | sort -n | head -1 | awk '{print $2}')
 echo "erlang: $apt_erlang_version  rabbitmq: $apt_rabbitmq_version"
 
 apt-get install -y \
-    esl-erlang=$apt_erlang_version \
+    erlang-nox=$apt_erlang_version \
     rabbitmq-server=$apt_rabbitmq_version
+
 
 
 echo "Adding $app environment to .bashrc ..."

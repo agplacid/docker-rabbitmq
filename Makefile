@@ -55,11 +55,22 @@ run:
 	@docker run -it --rm --name $(NAME) $(LOCAL_TAG) bash
 
 launch:
-	@docker run -d -h $(NAME).local --name $(NAME) -e "RABBITMQ_USE_LONGNAME=true" --tmpfs /var/lib/rabbitmq/mnesia:size=512M $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -h $(NAME).local --env-file default.env --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
 
 launch-net:
-	@docker run -d --name $(NAME)-alpha -h rabbitmq-alpha -e "KUBERNETES_USE_SHORTNAME=true" --network=local --net-alias rabbitmq-alpha $(LOCAL_TAG)
-	@docker run -d --name $(NAME)-beta -h rabbitmq-beta -e "KUBERNETES_USE_SHORTNAME=true" --network=local --net-alias rabbitmq-beta $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -h $(NAME).local --env-file default.env --network=local --net-alias $(NAME).local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+
+launch-as-dep:
+	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --env-file default.env --network=local --net-alias $(NAME)-alpha.local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --env-file default.env --network=local --net-alias $(NAME)-beta.local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+
+stop-as-dep:
+	@docker stop $(NAME)-alpha
+	@docker stop $(NAME)-beta
+
+rm-as-dep:
+	@docker rm $(NAME)-alpha
+	@docker rm $(NAME)-beta
 
 create-network:
 	@docker network create -d bridge local

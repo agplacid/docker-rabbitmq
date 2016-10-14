@@ -1,7 +1,6 @@
 # RabbitMQ 3.5.6 dockerized with kubernetes fixes and manifests
 
-![docker automated build](https://img.shields.io/docker/automated/callforamerica/rabbitmq.svg)
-![docker pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
+![docker automated build](https://img.shields.io/docker/automated/callforamerica/rabbitmq.svg) ![docker pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
 
 ## Maintainer
 
