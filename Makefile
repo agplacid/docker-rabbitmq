@@ -13,6 +13,11 @@ GITHUB_REPO = docker-rabbitmq
 DOCKER_REPO = rabbitmq
 BUILD_BRANCH = master
 
+VOLUME_ARGS = --tmpfs /var/lib/rabbitmq/mnesia:size=128M
+ENV_ARGS = --env-file default.env 
+SHELL = bash -l
+
+-include ../Makefile.inc
 
 .PHONY: all build test release shell run start stop rm rmi default
 
@@ -40,29 +45,29 @@ commit:
 	@git add -A .
 	@git commit
 
-dclean:
-	@-docker ps -aq | gxargs -I{} docker rm {} 2> /dev/null || true
-	@-docker images -f dangling=true -q | xargs docker rmi
-	@-docker volume ls -f dangling=true -q | xargs docker volume rm
+# dclean:
+# 	@-docker ps -aq | gxargs -I{} docker rm {} 2> /dev/null || true
+# 	@-docker images -f dangling=true -q | xargs docker rmi
+# 	@-docker volume ls -f dangling=true -q | xargs docker volume rm
 
 push:
 	@git push origin master
 
 shell:
-	@docker exec -ti $(NAME) /bin/bash
+	@docker exec -ti $(NAME) $(SHELL)
 
 run:
-	@docker run -it --rm --name $(NAME) $(LOCAL_TAG) bash
+	@docker run -it --rm --name $(NAME) $(LOCAL_TAG) $(SHELL)
 
 launch:
-	@docker run -d --name $(NAME) -h $(NAME).local --env-file default.env --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 
 launch-net:
-	@docker run -d --name $(NAME) -h $(NAME).local --env-file default.env --network=local --net-alias $(NAME).local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+	@docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) --network=local --net-alias $(NAME).local $(LOCAL_TAG)
 
 launch-as-dep:
-	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --env-file default.env --network=local --net-alias $(NAME)-alpha.local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
-	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --env-file default.env --network=local --net-alias $(NAME)-beta.local --tmpfs /var/lib/rabbitmq/mnesia:size=128M $(LOCAL_TAG)
+	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --network=local --net-alias $(NAME)-alpha.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
+	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --network=local --net-alias $(NAME)-beta.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 
 stop-as-dep:
 	@docker stop $(NAME)-alpha
@@ -77,7 +82,7 @@ create-network:
 
 proxies-up:
 	@cd ../docker-aptcacher-ng && make remote-persist
-	@cd ../docker-squid && make remote-persist
+	# @cd ../docker-squid && make remote-persist
 
 logs:
 	@docker logs $(NAME)
