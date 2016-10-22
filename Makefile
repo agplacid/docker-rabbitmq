@@ -65,24 +65,25 @@ launch:
 launch-net:
 	@docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) --network=local --net-alias $(NAME).local $(LOCAL_TAG)
 
-launch-as-dep:
+launch-dev:
 	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --network=local --net-alias $(NAME)-alpha.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --network=local --net-alias $(NAME)-beta.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 
-stop-as-dep:
-	@docker stop $(NAME)-alpha
-	@docker stop $(NAME)-beta
+rmf-dev:
+	@docker rm -f $(NAME)-alpha
+	@docker rm -f $(NAME)-beta
 
-rm-as-dep:
-	@docker rm $(NAME)-alpha
-	@docker rm $(NAME)-beta
+launch-as-dep:
+	@$(MAKE) launch-dev
+
+rmf-as-dep:
+	@$(MAKE) rmf-dev
 
 create-network:
 	@docker network create -d bridge local
 
 proxies-up:
 	@cd ../docker-aptcacher-ng && make remote-persist
-	# @cd ../docker-squid && make remote-persist
 
 logs:
 	@docker logs $(NAME)
