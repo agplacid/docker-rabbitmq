@@ -9,6 +9,5 @@ metadata:
 data:
   kubernetes.hostname-fix: 'true'
   rabbitmq.log-level: info
-  rabbitmq.use-longname: 'true'
-  # rabbitmq.host.a: rabbitmq-alpha
-  # rabbitmq.host.b: rabbitmq-beta
+  # rabbitmq.use-longname: 'true'
+  kubernetes.use-longname: 'false'

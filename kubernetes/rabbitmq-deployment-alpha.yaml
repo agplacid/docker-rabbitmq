@@ -27,21 +27,11 @@ spec:
             configMapKeyRef:
               name: rabbitmq-config
               key: rabbitmq.log-level
-        - name: RABBITMQ_USE_LONGNAME
+        - name: KUBERNETES_USE_LONGNAME
           valueFrom:
             configMapKeyRef:
               name: rabbitmq-config
               key: kubernetes.use-longname
-        - name: RABBITMQ_VM_MEMORY_HIGH_WATERMARK
-          valueFrom:
-            configMapKeyRef:
-              name: rabbitmq-config
-              key: rabbitmq.vm-memory-high-watermark
-        - name: RABBITMQ_ENABLED_PLUGINS
-          valueFrom:
-            configMapKeyRef:
-              name: rabbitmq-config
-              key: rabbitmq.enabled-plugins
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
             secretKeyRef:
@@ -80,16 +70,12 @@ spec:
           initialDelaySeconds: 10
           timeoutSeconds: 10
         livenessProbe:
-          # httpGet: 
-          #   host: guest:guest@localhost
-          #   port: admin
-          #   path: /api/aliveness-test/%2F
           exec:
             command: ["rabbitmqctl", "node_health_check", "|", "grep", "-q", "'^Health check passed'"]
           initialDelaySeconds: 20
           timeoutSeconds: 5
           # exec:
-          #   command: ["curl", "-i", "-u", "guest:guest", "http://localhost:15672/api/aliveness-test/%2F"]
+          #   command: ["curl", "-i", "-u", "$(RABBITMQ_DEFAULT_USER):$(RABBITMQ_DEFAULT_PASS)", "http://localhost:15672/api/aliveness-test/%2F"]
           # initialDelaySeconds: 30
           # timeoutSeconds: 10
       volumes:

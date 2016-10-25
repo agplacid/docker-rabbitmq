@@ -44,11 +44,24 @@ echo "Adding $app environment to .bashrc ..."
 tee /etc/profile.d/40-$app-env.sh <<'EOF'
 if [ -d /usr/lib/rabbitmq/bin ]
 then
-    export PATH=/usr/lib/rabbitmq/bin:$PATH
+    export PATH=/usr/local/bin:/usr/lib/rabbitmq/bin:$PATH
 fi
 export RABBITMQ_LOGS=-
-export RABBITMQ_SASL_LOGS=- 
+export RABBITMQ_SASL_LOGS=-
 export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-kernel inet_dist_listen_min 11500 inet_dist_listen_max 11999 $RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS"
+EOF
+
+
+echo "Adding rabbitmqctl wrapper ..."
+tee /usr/local/bin/rabbitmqctl <<'EOF'
+#!/bin/bash -l 
+
+if [[ $KUBERNETES_HOSTNAME_FIX = true ]]
+then
+    eval $(fix-kube-hostname enable 2> /dev/null)
+fi
+
+/usr/lib/rabbitmq/bin/rabbitmqctl $@
 EOF
 
 
@@ -60,7 +73,8 @@ rm -rf \
 
 
 echo "Setting permissions ..."
-chown -R $user:$user ~ /etc/rabbitmq /var/lib/rabbitmq
+chown -R $user:$user ~ /etc/rabbitmq /var/lib/rabbitmq /usr/local/bin
+chmod +x /usr/local/bin/rabbitmqctl
 
 
 echo "Cleaning up ..."
