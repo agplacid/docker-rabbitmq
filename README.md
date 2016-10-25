@@ -95,11 +95,7 @@ That's literally it
 
 ## Issues
 
-### 1. Sometimes the build process will exit early due to a remote server error using apt-get
-
-No idea why this happens but it only effects debian, lovely.  Careful consideration will be necessary to make sure building this image doesn't return early.  The build script sets the -e flag to ensure this isn't ignored silently.
-
-### 2. Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS. 
+### Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS. 
 
 For certain containers running erlang, it can be extremely convenient for the environments hostname to be resolvable to it's ip address outside of the pod.  The hack I've done to work around this requires root privileges at runtime to add entries to the `/etc/hosts` and /etc/hostname file as both are mounted by kubernetes in the container as the root user at runtime, effectively breaking the ability to set a non root user in the dockerfile.  `USER rabbitmq` has been commented out in the dockerfile for this reason.  If you are not running in a kubernetes environment and do not plan to take advantage of this feature by providing `KUBERNETES_HOSTNAME_FIX=true` to the environment, you can feel free to inherit from this dockerfile and set USER kazoo, `KUBERNETES_HOSTNAME_FIX` is false by default.
 
@@ -107,6 +103,9 @@ I've fixed this by creating a dummy hostname bash script and place it at the beg
 
 If anyone knows of a better way to do this, please submit a pull request with a short explanation of the process you used.
 
-### 3. Using gosu at the end of the entrypoint script breaks logging.
+### Docker.hub automated builds don't tolerate COPY or ADD to root /
 
-Using gosu at the end of the entrypoint script breaks a later bash script that uses su internally.  While rabbitmq still loads it doesn't output logs to stdout, breaking container logging conventions.  There could be other issues as well.  Since that later script is dropping priveleges at the end before executing the erlang virtual machine, it seems to be a minimal concern overall.
+I've added a comment to the Dockerfile noting this and for now am copying to
+/tmp and then copying to / in the next statement.
+
+ref: https://forums.docker.com/t/automated-docker-build-fails/22831/28
