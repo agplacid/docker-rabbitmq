@@ -5,8 +5,8 @@ MAINTAINER joe <joe@valuphone.com>
 ARG     ERLANG_VERSION
 ARG     RABBITMQ_VERSION
 
-ENV     ERLANG_VERSION=${ERLANG_VERSION:-19.1} \
-        RABBITMQ_VERSION=${RABBITMQ_VERSION:-3.6.5}
+ENV     ERLANG_VERSION=${ERLANG_VERSION:-19.2} \
+        RABBITMQ_VERSION=${RABBITMQ_VERSION:-3.6.6}
 
 LABEL   lang.erlang.version=$ERLANG_VERSION
 LABEL   app.rabbitmq.version=$RABBITMQ_VERSION
@@ -16,17 +16,12 @@ ENV     HOME=/var/lib/rabbitmq
 COPY    build.sh /tmp/build.sh
 RUN     /tmp/build.sh
 
-# bug with docker hub automated builds when interating with root directory
-# ref: https://forums.docker.com/t/automated-docker-build-fails/22831/27
-# COPY    entrypoint /entrypoint
-COPY    entrypoint /tmp/
-RUN     mv /tmp/entrypoint /
+COPY    entrypoint /
 
 ENV     ERL_MAX_PORTS=65536
-
 ENV     RABBITMQ_LOG_LEVEL=info
 
-EXPOSE  4369 5672 15672 11500-11999
+EXPOSE  4369 5672 15672
 
 # USER    rabbitmq
 

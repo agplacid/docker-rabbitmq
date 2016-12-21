@@ -7,15 +7,15 @@ LOCAL_TAG = $(NS)/$(NAME):$(VERSION)
 
 REGISTRY = callforamerica
 ORG = vp
-REMOTE_TAG = $(REGISTRY)/$(NAME):$(VERSION)
+REMOTE_TAG = $(REGISTRY)/$(NAME)
 
 GITHUB_REPO = docker-rabbitmq
 DOCKER_REPO = rabbitmq
 BUILD_BRANCH = master
 
-VOLUME_ARGS = --tmpfs /var/lib/rabbitmq/mnesia:size=128M
+# VOLUME_ARGS = --tmpfs /var/lib/rabbitmq/mnesia:size=128M
 ENV_ARGS = --env-file default.env 
-SHELL = bash -l
+DSHELL = bash -l
 
 -include ../Makefile.inc
 
@@ -45,33 +45,28 @@ commit:
 	@git add -A .
 	@git commit
 
-# dclean:
-# 	@-docker ps -aq | gxargs -I{} docker rm {} 2> /dev/null || true
-# 	@-docker images -f dangling=true -q | xargs docker rmi
-# 	@-docker volume ls -f dangling=true -q | xargs docker volume rm
-
 push:
 	@git push origin master
 
 shell:
-	@docker exec -ti $(NAME) $(SHELL)
+	@docker exec -ti $(NAME) $(DSHELL)
 
 run:
-	@docker run -it --rm --name $(NAME) $(LOCAL_TAG) $(SHELL)
+	@docker run -it --rm --name $(NAME) $(LOCAL_TAG) $(DSHELL)
 
 launch:
 	@docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 
 launch-net:
-	@docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) --network=local --net-alias $(NAME).local $(LOCAL_TAG)
+	docker run -d --name $(NAME) -h $(NAME).local $(ENV_ARGS) $(VOLUME_ARGS) --network=local --net-alias $(NAME).local $(LOCAL_TAG)
 
-launch-dev:
-	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --network=local --net-alias $(NAME)-alpha.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
-	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --network=local --net-alias $(NAME)-beta.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
+# launch-dev:
+# 	@docker run -d --name $(NAME)-alpha -h $(NAME)-alpha.local --network=local --net-alias $(NAME)-alpha.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
+# 	@docker run -d --name $(NAME)-beta -h $(NAME)-beta.local --network=local --net-alias $(NAME)-beta.local $(ENV_ARGS) $(VOLUME_ARGS) $(LOCAL_TAG)
 
-rmf-dev:
-	@docker rm -f $(NAME)-alpha
-	@docker rm -f $(NAME)-beta
+# rmf-dev:
+# 	@docker rm -f $(NAME)-alpha
+# 	@docker rm -f $(NAME)-beta
 
 launch-as-dep:
 	@$(MAKE) launch-dev
@@ -79,11 +74,11 @@ launch-as-dep:
 rmf-as-dep:
 	@$(MAKE) rmf-dev
 
-create-network:
-	@docker network create -d bridge local
+# create-network:
+# 	@docker network create -d bridge local
 
-proxies-up:
-	@cd ../docker-aptcacher-ng && make remote-persist
+# proxies-up:
+# 	@cd ../docker-aptcacher-ng && make remote-persist
 
 logs:
 	@docker logs $(NAME)
@@ -95,16 +90,13 @@ start:
 	@docker start $(NAME)
 
 kill:
-	-@docker kill $(NAME)-alpha
-	-@docker kill $(NAME)-beta
+	-@docker kill $(NAME)
 
 stop:
-	-@docker stop $(NAME)-alpha
-	-@docker stop $(NAME)-beta
+	-@docker stop $(NAME)
 
 rm:
-	-@docker rm $(NAME)-alpha
-	-@docker rm $(NAME)-beta
+	-@docker rm $(NAME)
 
 rmi:
 	@docker rmi $(LOCAL_TAG)

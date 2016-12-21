@@ -1,0 +1,108 @@
+# create creds:          kubectl create secret generic rabbitmq-creds --from-literal=rabbitmq.user=$(sed $(perl -e "print int rand(99999)")"q;d" /usr/share/dict/words) --from-literal=rabbitmq.pass=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 32)
+# create erlang cookie:  kubectl create secret generic erlang-cookie --from-literal=erlang.cookie=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 64)
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rabbitmq-config
+  labels:
+    app: rabbitmq
+data:
+  kubernetes.hostname-fix: 'true'
+  rabbitmq.log-level: info
+  # rabbitmq.use-longname: 'true'
+  kubernetes.use-longname: 'false'
+---
+kind: Service
+apiVersion: v1
+metadata: 
+  name: rabbitmq
+spec:
+  selector:
+    app: rabbitmq
+  ports:
+    - name: amqp
+      port: 5672
+    - name: admin
+      port: 15672
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: rabbitmq
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: callforamerica/rabbitmq:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: KUBERNETES_HOSTNAME_FIX
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: kubernetes.hostname-fix
+        - name: RABBITMQ_LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: rabbitmq.log-level
+        - name: KUBERNETES_USE_LONGNAME
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq-config
+              key: kubernetes.use-longname
+        - name: RABBITMQ_DEFAULT_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-creds
+              key: rabbitmq.user
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-creds
+              key: rabbitmq.pass
+        - name: ERLANG_COOKIE
+          valueFrom:
+            secretKeyRef:
+              name: erlang-cookie
+              key: erlang.cookie
+        ports:
+        - name: amqp
+          containerPort: 5672
+        - name: admin
+          containerPort: 15672
+        volumeMounts:
+        - name: mnesia-ramfs
+          mountPath: /var/lib/rabbitmq/mnesia
+        # resources:
+        #   requests:
+        #     cpu: 1
+        #     memory: 1Gi
+        #   limits:
+        #     cpu: 1
+        #     memory: 1Gi
+        readinessProbe:
+          tcpSocket:
+            port: 5672
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        # livenessProbe:
+        #   exec:
+        #     command: ["rabbitmqctl", "node_health_check", "|", "grep", "-q", "'^Health check passed'"]
+        #   initialDelaySeconds: 20
+        #   timeoutSeconds: 5
+          # exec:
+          #   command: ["curl", "-i", "-u", "$(RABBITMQ_DEFAULT_USER):$(RABBITMQ_DEFAULT_PASS)", "http://localhost:15672/api/aliveness-test/%2F"]
+          # initialDelaySeconds: 30
+          # timeoutSeconds: 10
+      volumes:
+      - name: mnesia-ramfs
+        emptyDir:
+          medium: Memory
+      restartPolicy: Always
