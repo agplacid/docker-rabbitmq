@@ -1,6 +1,3 @@
-# APP_VERSION = 3.6.6
-# IMAGE_VERSION = 2.1
-
 SHELL = /bin/zsh
 SHELLFLAGS = -ilc
 
@@ -9,7 +6,6 @@ DOCKER_REPO = callforamerica
 DOCKER_TAG := $(DOCKER_REPO)/$(NAME):latest
 
 GITHUB_REPO = $(shell basename $$PWD)
-DOCKER_REPO = $(NAME)
 BUILD_BRANCH = master
 
 CSHELL = bash -l
@@ -25,15 +21,12 @@ build:
 	@docker build -t $(DOCKER_TAG) --force-rm .
 	@-$(MAKE) dclean
 
-echo:
-	@echo $(BUILD_BRANCH)
-
 rebuild:
 	@docker build -t $(DOCKER_TAG) --force-rm --no-cache .
 	@-$(MAKE) dclean
 
 test:
-	@rspec ./tests/*.rb
+	@scripts/test-container.sh
 
 run:
 	@docker run -it --rm --name $(NAME) $(DOCKER_TAG) $(CSHELL)
@@ -72,6 +65,10 @@ rmi:
 
 rmf:
 	@docker rm --force $(NAME)
+
+push:
+	@docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
+	@docker push $(REPO)
 
 kube-deploy:
 	@kubectl create -f kubernetes/$(NAME)-service-alpha.yaml
