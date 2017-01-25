@@ -7,30 +7,18 @@ env:
   global:
   - DOCKER_USER=callforamerica
   # DOCKER_PASS
-  - secure: zhxZ4oUaZvBYXLyGkA4iq870R2uJhP31A8UeBrwSy9xb3DvPMo0fn3QW4bXjEjfR3c3JbhCgIKqpqw5cBOJe8XF9sz6vwfxj1Zliqwi+FrKDDeuaBOIvX/sBnyPEcl2tF4rg3RJAD/1IURphsFnoyBBgjfh4EdLg9sGEBEQSQJwD/rb3nHm2TgXbWBJKAxJMd24pBlgwaxf/tG3QJ2H40d3Vdd5XHtK2qtyy0mWY7O/wI52B2Pb7K26CB/LbpVifZ9glhW7jqZboJwVM8FXFLuvtdOKS0D09Kkd+FVLSIzGMBUqX5VmalwWkriY11zM7OifrR0/c7X1jHHWrbLY1FZPXr1gQUbWjpq9NX0ZXnPvKiXF339q9266N8VN5rJ8rlNnLUrpJz16qvzK+ni0YF1Di37T2gVEgVd4FnZgOxjHp7aegqEWpB/CWIAnGUWjBhizC2X8rSXZKvuAbHy5L8uZlQuslRxkk5NjUt7+wlmWF6dp0ie7PRwblBLM+pzoxte/tOXkPpJE3xiBMujbc/CsPAi1+vr43nZmRkkkqTht85wHpmbJI1hT8zbi+BfN4+Xhhus9lmWUWI04tx9CT8/0ZqIn/s3If+Yixj/GENr54swU0ywJNtWIWMUDkE+/YZ5W1bODj7QtKWZc1dHD823WITsI3m5Zp29fIMrWneho=
-  # SLACK_TOKEN
-  - secure: "TG7aSH3NIXqi3gEjMIyuK7uaBrVPcOjZwsC+oq+FSTOgr7dD3VR/zBdDaDc64E4Y0mK0tmgAFcC8VPvWMjiwXNFYhBs+O1b8Bjtvlstsrad469VYOff52iDAsKF9qrgCzCfoWzunuXX51b9cpN6g+napwFH+RhVKySqWpsVZaudtnTB/YpD4RGwwaddyoRy2i1IO6CslcGKaMGgSdpGwXSZusw+XD/iSAqD2QYh89qYzU/WxlgA2wgHS9QLJYYyLuA+8/VR9ZR4AbD4xTPOJaGGLoF59bIhLGarHgfm9ucmEPoWMEUF1aXWBql0M9EgWpDhaGcClpuxpd2VJneM+gJVmDnRjBqBI0zPmgcqL5roeiiteY9xmArF0T/+mcLk4V4hA8XDsZ76Nc64lt+HEYqaanYlzERRm17ctu+VD/ZmE/csdIb36mVSAYcKOVnEXxoMyVlDJardRgNfLZGstx+fMpDq4qTDZ+ZTy03fJAd3VYOBC+mLfTIVl8CYLoyrD58SEfs1zMB2BbRFkuO7sN7zI3dxxNDjKqjaSlLJw8aonri4y4tt+ViucmOLAT5//UlowrtZeEjzGAO/egmgvXKRtQmETWSVau8yRUMQu3l/jRZS/HPjzWpWJ/la3ARY+FooZtrKo+aUW4vGue/Y6FmSOOLGcL3n3zDeZj97O3HQ="
-
+  - secure: "zhxZ4oUaZvBYXLyGkA4iq870R2uJhP31A8UeBrwSy9xb3DvPMo0fn3QW4bXjEjfR3c3JbhCgIKqpqw5cBOJe8XF9sz6vwfxj1Zliqwi+FrKDDeuaBOIvX/sBnyPEcl2tF4rg3RJAD/1IURphsFnoyBBgjfh4EdLg9sGEBEQSQJwD/rb3nHm2TgXbWBJKAxJMd24pBlgwaxf/tG3QJ2H40d3Vdd5XHtK2qtyy0mWY7O/wI52B2Pb7K26CB/LbpVifZ9glhW7jqZboJwVM8FXFLuvtdOKS0D09Kkd+FVLSIzGMBUqX5VmalwWkriY11zM7OifrR0/c7X1jHHWrbLY1FZPXr1gQUbWjpq9NX0ZXnPvKiXF339q9266N8VN5rJ8rlNnLUrpJz16qvzK+ni0YF1Di37T2gVEgVd4FnZgOxjHp7aegqEWpB/CWIAnGUWjBhizC2X8rSXZKvuAbHy5L8uZlQuslRxkk5NjUt7+wlmWF6dp0ie7PRwblBLM+pzoxte/tOXkPpJE3xiBMujbc/CsPAi1+vr43nZmRkkkqTht85wHpmbJI1hT8zbi+BfN4+Xhhus9lmWUWI04tx9CT8/0ZqIn/s3If+Yixj/GENr54swU0ywJNtWIWMUDkE+/YZ5W1bODj7QtKWZc1dHD823WITsI3m5Zp29fIMrWneho="
 notifications:
   email:
     on_success: never
     on_failure: always
   slack:
     rooms:
-    - secure: wWHG1V9UWtnw1FzhiB4ZIHsI3DHFek7Tck5Ud+vRppAUqLEFuaMthr1vYii4tzlQUouaybEhpxPIveTjM6PuhXSBARQlJ5kElWbcWcEyEafG/t8+dT2VuHxhI/i+BRPikT3a9slvpPWSCbwW2OAL8ktM+N57Wdw19iZMhw9/RVdvMJhVzbHN4XAw0F12bW7NjBB/IKe74bS340IvZg0fupSKdjJQ/kBWI8uUqRROBjd2CNMTiMam9BTcID6TwJ9KGLBClHer47rOyUhf+4e0oe0fx2iL5GjX2+LUd06sME1uTlQq/VhWCfIBdNF1hVBwe9eJMPepR3VSFwPom/EkRMA5nY7EtHxxmKDWd/dbaOZXNYJvQ42fZJSD7HfUncBS4x2q0UKV7QE5W10JDayA6SfZ8Z05ZH2W3IT5Mo81xZkC0nCCXUmryThrJKYMsLo70TPZ2ji4jC+QIuaP3PPlVy0ZBijWfRMqDuNR0VAKpmsgpcW5RqQeFpQDqCm8LLhxmvBeU4RDsMOIH1Kc4yq78kP9tCJ6EwWR4ut7meuDCir+cTdsSJ75RjLfLh+gwUf+QLQg9nTzpJyslojb/Xgsy/7Qc+CA3Xr3c1uq95TT6oG6QvTuYYv41c9K5KWpJ2b6n3W7s2xb/OqpDozQlTdBtV0Rn8m2FJmKs44k3Qmz8iE=
+    - secure: "wWHG1V9UWtnw1FzhiB4ZIHsI3DHFek7Tck5Ud+vRppAUqLEFuaMthr1vYii4tzlQUouaybEhpxPIveTjM6PuhXSBARQlJ5kElWbcWcEyEafG/t8+dT2VuHxhI/i+BRPikT3a9slvpPWSCbwW2OAL8ktM+N57Wdw19iZMhw9/RVdvMJhVzbHN4XAw0F12bW7NjBB/IKe74bS340IvZg0fupSKdjJQ/kBWI8uUqRROBjd2CNMTiMam9BTcID6TwJ9KGLBClHer47rOyUhf+4e0oe0fx2iL5GjX2+LUd06sME1uTlQq/VhWCfIBdNF1hVBwe9eJMPepR3VSFwPom/EkRMA5nY7EtHxxmKDWd/dbaOZXNYJvQ42fZJSD7HfUncBS4x2q0UKV7QE5W10JDayA6SfZ8Z05ZH2W3IT5Mo81xZkC0nCCXUmryThrJKYMsLo70TPZ2ji4jC+QIuaP3PPlVy0ZBijWfRMqDuNR0VAKpmsgpcW5RqQeFpQDqCm8LLhxmvBeU4RDsMOIH1Kc4yq78kP9tCJ6EwWR4ut7meuDCir+cTdsSJ75RjLfLh+gwUf+QLQg9nTzpJyslojb/Xgsy/7Qc+CA3Xr3c1uq95TT6oG6QvTuYYv41c9K5KWpJ2b6n3W7s2xb/OqpDozQlTdBtV0Rn8m2FJmKs44k3Qmz8iE="
     on_success: always
     on_failure: always
 
 before_install: source scripts/init-ci-env.sh
-
-# - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
-#   echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
-# - export NAME=$(basename $TRAVIS_REPO_SLUG | cut -d'-' -f2)
-# - export REPO=$DOCKER_USER/$NAME
-# - export TAG=$(if [[ $BRANCH == "master" ]]; then
-#   echo "latest"; else echo $BRANCH; fi)
-# - export DOCKER_TAG=$REPO:$COMMIT
-# - 'echo "COMMIT: $COMMIT  BRANCH: $BRANCH  REPO: $REPO  TAG: $TAG"'
 
 install:
 - make build
@@ -42,8 +30,3 @@ after_success:
 - docker tag $REPO:$COMMIT $REPO:$TAG
 - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
 - make push
-
-# - docker tag $REPO:$COMMIT $REPO:$TAG
-# - docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-# - docker login -u $DOCKER_USER -p $DOCKER_PASS
-# - docker push $REPO
