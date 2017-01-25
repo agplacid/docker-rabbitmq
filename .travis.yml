@@ -1,0 +1,29 @@
+services: docker
+
+env:
+  global:
+  - secure: jBOPFG0g8kv0eWIfZ7MwFiN5KASocKPkEjBACIDpOOyVYcFOyez6YvBZKuBH4cPDOtpP7zVkHcm7sUr6rvUX2QlTPXZfKjKYahs8d8U9+Hh7srPmqr5uHLL8c9jA7x3I6rQE7eXh2IGjQZf1bwEciYHVapw0dbYxZqKvK34pYQucfLuaCUIOt3A66NBYds2P5hn4kaVd+4RNYPDJPKa7Vo1Z886+vBYueV9uonfna4xaprNK/ctC1Yg/JGojXj3tU8XtxG9EQjMjsZ8huDSLyg+NAQuxSUH9O8HWB3QZpKMx2GBk4PpfGC9HS1Xni/k+03LIgyR81Qzawvx178AJyz6uMF0m1oGZO2C6ou544+l8mdip2C7WtrpFcVIncqousiI9UH3et+Js8BOr/poMXE4HYi5GqGTRQ2PHk9SEzMop/koyRI7bFjw7sA54nQjwEl/U7YLoy98B98Ndj3r7Q/EXTiwnMnVbvghVxvkp8URc0qLaymDi8skLOpCIGXfqdTNus4tLaYKju6SdL9j1rmKn1trA400GRJhKv9vzvhaUjUALFMgFguBtVWMBc1sFQesNSgREN5Wbf6Kj101H8A04mH6TZHtvHDb8zAv6K3OPjotmVoJoru07TZ+UWVSvONEqmycYpw0qBq268WGUrc17Ti/b3CvVbru+/pIjPvU=
+  - secure: zhxZ4oUaZvBYXLyGkA4iq870R2uJhP31A8UeBrwSy9xb3DvPMo0fn3QW4bXjEjfR3c3JbhCgIKqpqw5cBOJe8XF9sz6vwfxj1Zliqwi+FrKDDeuaBOIvX/sBnyPEcl2tF4rg3RJAD/1IURphsFnoyBBgjfh4EdLg9sGEBEQSQJwD/rb3nHm2TgXbWBJKAxJMd24pBlgwaxf/tG3QJ2H40d3Vdd5XHtK2qtyy0mWY7O/wI52B2Pb7K26CB/LbpVifZ9glhW7jqZboJwVM8FXFLuvtdOKS0D09Kkd+FVLSIzGMBUqX5VmalwWkriY11zM7OifrR0/c7X1jHHWrbLY1FZPXr1gQUbWjpq9NX0ZXnPvKiXF339q9266N8VN5rJ8rlNnLUrpJz16qvzK+ni0YF1Di37T2gVEgVd4FnZgOxjHp7aegqEWpB/CWIAnGUWjBhizC2X8rSXZKvuAbHy5L8uZlQuslRxkk5NjUt7+wlmWF6dp0ie7PRwblBLM+pzoxte/tOXkPpJE3xiBMujbc/CsPAi1+vr43nZmRkkkqTht85wHpmbJI1hT8zbi+BfN4+Xhhus9lmWUWI04tx9CT8/0ZqIn/s3If+Yixj/GENr54swU0ywJNtWIWMUDkE+/YZ5W1bODj7QtKWZc1dHD823WITsI3m5Zp29fIMrWneho=
+  - COMMIT=${TRAVIS_COMMIT::6}
+
+before_install:
+- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+  echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+- export NAME=$(basename $TRAVIS_REPO_SLUG | cut -d'-' -f2)
+- export REPO=$DOCKER_USER/$NAME
+- export TAG=$(if [[ $BRANCH == "master" ]]; then
+  echo "latest"; else echo $BRANCH; fi)
+- export DOCKER_TAG=$REPO:$COMMIT
+- 'echo "COMMIT: $COMMIT  BRANCH: $BRANCH  REPO: $REPO  TAG: $TAG"'
+
+install:
+- make DOCKER_TAG=$DOCKER_TAG build
+- make DOCKER_TAG=$DOCKER_TAG launch
+
+script: test/test-container.sh
+
+after_success:
+- docker tag $REPO:$COMMIT $REPO:$TAG
+- docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
+- docker login -u $DOCKER_USER -p $DOCKER_PASS
+- docker push $REPO

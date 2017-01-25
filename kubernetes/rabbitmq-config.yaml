@@ -1,13 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: rabbitmq-config
+  name: rabbitmq
   labels:
     app: rabbitmq
     project: valuphone
     environment: production
 data:
-  kubernetes.hostname-fix: 'true'
-  rabbitmq.log-level: info
-  # rabbitmq.use-longname: 'true'
-  kubernetes.use-longname: 'false'
+  kube.hostname.fix: 'true'
+  kube.hostname.short: 'true'
+  rabbitmq.log.level: info

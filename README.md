@@ -1,4 +1,4 @@
-# RabbitMQ 3.5.6 dockerized with kubernetes fixes and manifests
+# RabbitMQ dockerized with kubernetes fixes and manifests
 
 ![docker automated build](https://img.shields.io/docker/automated/callforamerica/rabbitmq.svg) ![docker pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
 
@@ -6,7 +6,7 @@
 
 Joe Black <joe@valuphone.com>
 
-## Introduction 
+## Introduction
 
 Minimal image, the only plugin is rabbitmq-management.
 
@@ -95,7 +95,7 @@ That's literally it
 
 ## Issues
 
-### Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS. 
+### Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS.
 
 For certain containers running erlang, it can be extremely convenient for the environments hostname to be resolvable to it's ip address outside of the pod.  The hack I've done to work around this requires root privileges at runtime to add entries to the `/etc/hosts` and /etc/hostname file as both are mounted by kubernetes in the container as the root user at runtime, effectively breaking the ability to set a non root user in the dockerfile.  `USER rabbitmq` has been commented out in the dockerfile for this reason.  If you are not running in a kubernetes environment and do not plan to take advantage of this feature by providing `KUBERNETES_HOSTNAME_FIX=true` to the environment, you can feel free to inherit from this dockerfile and set USER kazoo, `KUBERNETES_HOSTNAME_FIX` is false by default.
 

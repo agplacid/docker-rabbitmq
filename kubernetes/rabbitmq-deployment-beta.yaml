@@ -16,26 +16,22 @@ spec:
       - name: rabbitmq
         image: callforamerica/rabbitmq
         imagePullPolicy: Always
-        volumeMounts:
-        - name: erlang-cookie-secret
-          readOnly: true
-          mountPath: /etc/secrets/erlang
         env:
-        - name: KUBERNETES_HOSTNAME_FIX
+        - name: KUBE_HOSTNAME_FIX
           valueFrom:
             configMapKeyRef:
-              name: rabbitmq-config
-              key: kubernetes.hostname-fix
+              name: rabbitmq
+              key: kube.hostname.fix
+        - name: KUBE_HOSTNAME_SHORT
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq
+              key: kube.hostname.short
         - name: RABBITMQ_LOG_LEVEL
           valueFrom:
             configMapKeyRef:
-              name: rabbitmq-config
-              key: rabbitmq.log-level
-        - name: KUBERNETES_USE_LONGNAME
-          valueFrom:
-            configMapKeyRef:
-              name: rabbitmq-config
-              key: kubernetes.use-longname
+              name: rabbitmq
+              key: rabbitmq.log.level
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
             secretKeyRef:
@@ -64,10 +60,10 @@ spec:
         resources:
           requests:
             cpu: 1
-            memory: 1G
+            memory: 1Gi
           limits:
             cpu: 1
-            memory: 1G
+            memory: 1Gi
         readinessProbe:
           tcpSocket:
             port: 5672
