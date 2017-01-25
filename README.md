@@ -1,111 +1,115 @@
-# RabbitMQ dockerized with kubernetes fixes and manifests
+# RabbitMQ (stable) dockerized w/ Kubernetes fixes & manifests
 
-![docker automated build](https://img.shields.io/docker/automated/callforamerica/rabbitmq.svg) ![docker pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
+![Build Status](https://travis-ci.org/sip-li/docker-rabbitmq.svg?branch=master)](https://travis-ci.org/sip-li/docker-rabbitmq) ![Docker Pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
 
 ## Maintainer
 
-Joe Black <joe@valuphone.com>
+Joe Black <joeblack949@gmail.com>
 
-## Introduction
+## Description
 
-Minimal image, the only plugin is rabbitmq-management.
+Minimal image with one plugin *(rabbitmq-management)*.  This image uses a custom version of Debian Linux (Jessie) that I designed weighing in at ~22MB compressed.
 
 ## Build Environment
 
-Build environment variables are often used in the build script as plug in variables that can be set in the Dockerfile to bump version numbers of the various things that are installed during the `docker build` phase.  
-
-In the case of this image, however, erlang and rabbitmq are installed via apt-get simply to grab the most current version.  This is made possible by adding some third party repos to apt beforehand which make the packages for erlang 19.x and rabbitmq-server 3.5.x available.  The decision was made to still export these variables to the environment during the build process in order to make them available to the build script and the entrypoint script in a manner consistent with the rest of the images.
-
-The following variables are currently ignored in the build and entrypoint scripts and are included for possible future use and consistency:
+Build environment variables are often used in the build script to bump version numbers and set other options during the docker build phase.  Their values can be overridden using a build argument of the same name.
 
 * `ERLANG_VERSION`
 * `RABBITMQ_VERSION`
 
-The following variables are used in the build script:
+The following variables also help to reduce duplication:
 
-* `DUMB_INIT_VERSION`: value provided is used as the version of dumb-init to install. String, defaults to `1.1.3`.
+* `APP`: rabbitmq
+* `USER`: rabbitmq
+* `HOME` /var/lib/rabbitmq
+
 
 ## Run Environment
 
-Run environment variables are used in the entrypoint script when rendering configuration templates and sometimes also for flow control in the entrypoint script.  These values can be provided when inheriting from the base dockerfile, or also specified at `docker run` as `-e` arguments, and in kubernetes manifests in the `env` array.
+Run environment variables are used in the entrypoint script to render configuration templates, flow control, etc.  These values can be overridden when inheriting from the base dockerfile, specified during `docker run`, or in kubernetes manifests in the `env` array.
 
-* `RABBITMQ_LOG_LEVEL`: value provided is lowercased and supplied as the value for the connection log_level tuple in `rabbitmq.config`  String, defaults to `info`
+* `RABBITMQ_LOG_LEVEL`: lowercased and used as the value for the connection log_level tuple in `rabbitmq.config`.  Defaults to `info`.
 
-* `RABBITMQ_DISK_FREE_LIMIT`: value provided is supplied as the value of the `vm_memory_high_watermark` tuple in the `rabbitmq.config` file.  String, defaults to `50MB`
+* `RABBITMQ_DISK_FREE_LIMIT`: used as the value for the `vm_memory_high_watermark` tuple in the `rabbitmq.config` file.  Defaults to `50MB`.
 
-* `RABBITMQ_VM_MEMORY_HIGH_WATERMARK`: value provided is supplied as the value for the `vm_memory_high_watermark` in the `rabbitmq.config` file. String, defaults to `0.8`
+* `RABBITMQ_VM_MEMORY_HIGH_WATERMARK`: used as the value for the `vm_memory_high_watermark` in the `rabbitmq.config` file.  Defaults to `0.8`.
 
-In addition to these environment variables, there are numerous other environment variables recognized by the rabbitmq bash script, several of these can be seen used in the current Dockerfile.  Refer to [https://www.rabbitmq.com/configure.html](https://www.rabbitmq.com/configure.html) for more details.
+* `RABBITMQ_ENABLED_PLUGINS`: `,`'s are replaced with ` `'s and fed as positional arguments to `rabbitmq-plugins enable --offline` before starting rabbitmq.  Defaults to `rabbitmq_management,rabbitmq_management_agent`.
 
-Also there are some environment variables recognized by the erlang vm itself.  These often start with `ERL_`.
 
-: ${RABBITMQ_LOG_LEVEL:=info}
-: ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
-: ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:=0.8}
+In addition to these, there are numerous other variables recognized by the rabbitmq bash script.
 
-## Instructions
+ref: [https://www.rabbitmq.com/configure.html](https://www.rabbitmq.com/configure.html)
 
-### Running locally under docker
 
-If building and running locally for quick testing, feel free to use the convenience targets in the Makefile.
+## Usage
 
-`make launch`: launch under docker locally using the latest build version and default docker network.
+### Under docker (manual-build)
 
-`make launch-net`: launch under docker locally using the latest version and the docker network: `local`.  You can create this network if it doesn't exist with `make create-network`.
+If building and running locally, feel free to use the convenience targets in the included `Makefile`.
 
-`make launch-deps`: Starts up local rabbitmq and couchdb servers for local testing. (requires the docker-couchdb and docker-rabbitmq projects to also be reachable as sibling directories)
+`make build`: rebuilds the docker image.
 
-`make logsf`: Tail the logs of the kazoo docker container you just launched
+`make launch`: launch for testing.
 
-`make shell`: Exec's into the kazoo container you just launched with a bash shell
+`make logs`: tail the logs of the container.
 
-*There are way more convenience targets in the Makefile, be sure to check it out.*
+`make shell`: exec's into the docker container interactively with tty and bash shell.
 
-### Running under docker using docker hub prebuilt image
+*and many others...*
 
-All of our docker-* repos in github have automatic build pipelines setup with docker hub, reachable at [https://hub.docker.com/r/callforamerica/](https://hub.docker.com/r/callforamerica/).
 
-This image resides at: [https://hub.docker.com/r/callforamerica/rabbitmq](https://hub.docker.com/r/callforamerica/rabbitmq), and under docker using the shortform: `callforamerica/rabbitmq`
+### Under docker (pre-built)
 
-You can run this docker hub image using the following docker run command:
+All of our docker-* repos in github have CI pipelines that push to docker cloud/hub.  
+
+This image is available at:
+* [https://store.docker.com/community/images/callforamerica/rabbitmq](https://store.docker.com/community/images/callforamerica/rabbitmq)
+*  [https://hub.docker.com/r/callforamerica/rabbitmq](https://hub.docker.com/r/callforamerica/).
+
+and through docker itself:
+```bash
+docker pull callforamerica/rabbitmq
+```
+
+To run:
 
 ```bash
 docker run -d \
     --name rabbitmq \
     -h rabbitmq \
-    -e "KAZOO_LOG_LEVEL=info" \
-    callforamerica/rabbitmq:4
+    callforamerica/rabbitmq
 ```
-*It's reccomended to run rabbitmq without mapping any ports to the host machine and rather use the dns function in your cluster manager to do service discovery.*
 
-Please use the Run Environment section above to determine which environment variables you will need to change here to get everything working correctly.
+Please use the `Run Environment` section above to determine which environment variables you might want to change here.
 
-### Running under kubernetes
 
-Edit the manifests under kubernetes/ to best reflect your environment and configuration.
+### Under Kubernetes
 
-You will need to create a kubernetes secret named `erlang-cookie` including the base64'd erlang-cookie under the key: `cookie` or update the deployment manifest to reflect your own name.  See kubernetes documentation for instructions on how to do this.
+Edit the manifests under `kubernetes/` to reflect your specific environment and configuration.
 
-Create the kubernetes service: `make kube-deploy-service`
+Create a secret for the erlang cookie:
+```bash
+kubectl create secret generic erlang-cookie --from-literal=erlang.cookie=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 64)
+```
 
-Create the kubernetes deployment: `make kube-deploy`
+Create a secret for the rabbitmq credentials:
+```bash
+kubectl create secret generic rabbitmq-creds --from-literal=rabbitmq.user=$(sed $(perl -e "print int rand(99999)")"q;d" /usr/share/dict/words) --from-literal=rabbitmq.pass=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 32)
+```
 
-That's literally it
+Deploy rabbitmq:
+```bash
+kubectl create -f kubernetes
+```
 
 
 ## Issues
 
-### Kubernetes Pod hostname's do not reflect it's PodIP assigned DNS.
+### Kubernetes Pod hostname does not reflect the resolvable pod hostname.
 
-For certain containers running erlang, it can be extremely convenient for the environments hostname to be resolvable to it's ip address outside of the pod.  The hack I've done to work around this requires root privileges at runtime to add entries to the `/etc/hosts` and /etc/hostname file as both are mounted by kubernetes in the container as the root user at runtime, effectively breaking the ability to set a non root user in the dockerfile.  `USER rabbitmq` has been commented out in the dockerfile for this reason.  If you are not running in a kubernetes environment and do not plan to take advantage of this feature by providing `KUBERNETES_HOSTNAME_FIX=true` to the environment, you can feel free to inherit from this dockerfile and set USER kazoo, `KUBERNETES_HOSTNAME_FIX` is false by default.
+For apps that use the erlang distribution protocol it's often necessary to have a hostname that can be resolved to it's ip address.  Unfortunately Kubernetes doesn't assign the resolvable hostname of the pod as the container hostname.  
 
-I've fixed this by creating a dummy hostname bash script and place it at the beginning of the path: '/var/lib/rabbitmq/bin/hostname-fix'.  In the entrypoint script, if `KUBERNETES_HOSTNAME_FIX` is set, this script is linked at runtime to '/var/lib/rabbitmq/bin/hostname', and the environment variable `HOSTNAME` is set correctly, as well as creating entries in /etc/hosts and overwriting /etc/hostname.
+When running under Kubernetes you will want to set the following environment variables to true, `KUBE_HOSTNAME_FIX` & `KUBE_HOSTNAME_SHORT`.  
 
-If anyone knows of a better way to do this, please submit a pull request with a short explanation of the process you used.
-
-### Docker.hub automated builds don't tolerate COPY or ADD to root /
-
-I've added a comment to the Dockerfile noting this and for now am copying to
-/tmp and then copying to / in the next statement.
-
-ref: https://forums.docker.com/t/automated-docker-build-fails/22831/28
+This exports the correct `HOSTNAME` environment variables as well as adding the hosts to `/etc/hosts`, writing over `/etc/hostname`, and wrapping the hostname binary with a custom wrapper that will return the correct hostname (achieved by manipulating the PATH).
