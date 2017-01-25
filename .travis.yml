@@ -18,10 +18,6 @@ notifications:
     secure: wWHG1V9UWtnw1FzhiB4ZIHsI3DHFek7Tck5Ud+vRppAUqLEFuaMthr1vYii4tzlQUouaybEhpxPIveTjM6PuhXSBARQlJ5kElWbcWcEyEafG/t8+dT2VuHxhI/i+BRPikT3a9slvpPWSCbwW2OAL8ktM+N57Wdw19iZMhw9/RVdvMJhVzbHN4XAw0F12bW7NjBB/IKe74bS340IvZg0fupSKdjJQ/kBWI8uUqRROBjd2CNMTiMam9BTcID6TwJ9KGLBClHer47rOyUhf+4e0oe0fx2iL5GjX2+LUd06sME1uTlQq/VhWCfIBdNF1hVBwe9eJMPepR3VSFwPom/EkRMA5nY7EtHxxmKDWd/dbaOZXNYJvQ42fZJSD7HfUncBS4x2q0UKV7QE5W10JDayA6SfZ8Z05ZH2W3IT5Mo81xZkC0nCCXUmryThrJKYMsLo70TPZ2ji4jC+QIuaP3PPlVy0ZBijWfRMqDuNR0VAKpmsgpcW5RqQeFpQDqCm8LLhxmvBeU4RDsMOIH1Kc4yq78kP9tCJ6EwWR4ut7meuDCir+cTdsSJ75RjLfLh+gwUf+QLQg9nTzpJyslojb/Xgsy/7Qc+CA3Xr3c1uq95TT6oG6QvTuYYv41c9K5KWpJ2b6n3W7s2xb/OqpDozQlTdBtV0Rn8m2FJmKs44k3Qmz8iE=
     on_success: always
     on_failure: always
-    on_pull_requests: false
-    on_success: always
-    on_failure: always
-    on_pull_requests: false
 
 before_install: source scripts/init-ci-env.sh
 

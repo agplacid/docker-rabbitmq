@@ -1,6 +1,7 @@
-# RabbitMQ (stable) dockerized w/ Kubernetes fixes & manifests
+# RabbitMQ (stable) w/ Kubernetes fixes & manifests
 
-![Build Status](https://travis-ci.org/sip-li/docker-rabbitmq.svg?branch=master)](https://travis-ci.org/sip-li/docker-rabbitmq) ![Docker Pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)
+[![Build Status](https://travis-ci.org/sip-li/docker-rabbitmq.svg?branch=master)](https://travis-ci.org/sip-li/docker-rabbitmq)
+[![Docker Pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)](https://store.docker.com/community/images/callforamerica/rabbitmq)
 
 ## Maintainer
 

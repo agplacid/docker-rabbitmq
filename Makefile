@@ -3,9 +3,9 @@ SHELLFLAGS = -ilc
 
 NAME := $(shell basename $$PWD | cut -d'-' -f2)
 DOCKER_REPO = callforamerica
-DOCKER_TAG := $(DOCKER_REPO)/$(NAME):latest
+DOCKER_TAG ?= $(DOCKER_REPO)/$(NAME):latest
 
-GITHUB_REPO = $(shell basename $$PWD)
+GITHUB_REPO := $(shell basename $$PWD)
 BUILD_BRANCH = master
 
 CSHELL = bash -l
