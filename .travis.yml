@@ -1,4 +1,8 @@
 services: docker
+addons:
+  apt:
+    packages:
+    - zsh
 
 env:
   global:
