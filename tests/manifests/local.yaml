@@ -5,6 +5,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: rabbitmq-creds
+  labels:
+    app: rabbitmq
+    test: 'true'
+    environment: testing
 type: Opaque
 data:
   rabbitmq.pass: RVZCNklCQVhWMTlUWEtlQWZ4dWRUQkk0RVk3dzljaWk=
@@ -14,6 +18,10 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: erlang-cookie
+  labels:
+    app: rabbitmq
+    test: 'true'
+    environment: testing
 type: Opaque
 data:
   erlang.cookie: WlgyZVA4Umo4cnVmUjVJbjNnWGV1akhYNllseEREbnRyd3ZROE5kcGd3OXFOQjZ5UFhPUWhxNFF4bEc0WnZaQQ==
@@ -24,6 +32,8 @@ metadata:
   name: rabbitmq
   labels:
     app: rabbitmq
+    test: 'true'
+    environment: testing
 data:
   kube.hostname.fix: 'true'
   kube.hostname.short: 'true'
@@ -33,6 +43,10 @@ kind: Service
 apiVersion: v1
 metadata:
   name: rabbitmq
+  labels:
+    app: rabbitmq
+    test: 'true'
+    environment: testing
 spec:
   selector:
     app: rabbitmq
@@ -46,12 +60,18 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: rabbitmq
+  labels:
+    app: rabbitmq
+    test: 'true'
+    environment: testing
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         app: rabbitmq
+        test: 'true'
+        environment: testing
     spec:
       containers:
       - name: rabbitmq

@@ -6,14 +6,14 @@ set -e
 [[ -f /etc/default/$APP ]] && . /etc/default/$APP
 
 # log levels: debug info warning error none
-: ${RABBITMQ_LOG_LEVEL:=info}
-: ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
-: ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:=0.8}
+: readonly ${RABBITMQ_LOG_LEVEL:=info}
+: readonly ${RABBITMQ_DISK_FREE_LIMIT:=50MB}
+: readonly ${RABBITMQ_VM_MEMORY_HIGH_WATERMARK:=0.8}
 
-: ${RABBITMQ_DEFAULT_USER:=guest}
-: ${RABBITMQ_DEFAULT_PASS:=guest}
+: readonly ${RABBITMQ_DEFAULT_USER:=guest}
+: readonly ${RABBITMQ_DEFAULT_PASS:=guest}
 
-: ${RABBITMQ_ENABLED_PLUGINS:=rabbitmq_management,rabbitmq_management_agent}
+: readonly ${RABBITMQ_ENABLED_PLUGINS:=rabbitmq_management,rabbitmq_management_agent}
 
 
 log::m-info "Writing rabbitmq.config ..."

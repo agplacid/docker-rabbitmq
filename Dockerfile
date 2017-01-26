@@ -27,7 +27,7 @@ EXPOSE  5672 15672
 
 VOLUME  ["/var/lib/rabbitmq/mnesia"]
 
-WORKDIR /var/lib/rabbitmq
+WORKDIR $HOME
 
 ENTRYPOINT  ["/dumb-init", "--"]
 CMD         ["/entrypoint"]
