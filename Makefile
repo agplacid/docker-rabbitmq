@@ -25,11 +25,11 @@ ENV_ARGS = --env-file default.env
 
 build:
 	@docker build -t $(DOCKER_IMAGE) --force-rm .
-	@test $(LOCAL) && $(MAKE) dclean
+	@-test $(LOCAL) && $(MAKE) dclean
 
 rebuild:
 	@docker build -t $(DOCKER_IMAGE) --force-rm --no-cache .
-	@test $(LOCAL) && $(MAKE) dclean
+	@-test $(LOCAL) && $(MAKE) dclean
 
 tag:
 	@test $(ALT_TAG) && \
