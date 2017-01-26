@@ -19,11 +19,7 @@ notifications:
     on_failure: always
 
 before_install:
-- if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
-  export BRANCH=$TRAVIS_BRANCH
-  else
-  export BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
-  fi
+- source scripts/ci-env.sh
 - make info
 
 install:
