@@ -18,7 +18,13 @@ notifications:
     on_success: always
     on_failure: always
 
-before_install: source scripts/init-ci-env.sh
+before_install:
+- | if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then
+    export BRANCH=$TRAVIS_BRANCH
+    else
+    export BRANCH=$TRAVIS_PULL_REQUEST_BRANCH
+    fi
+- make info
 
 install:
 - make build
@@ -27,6 +33,8 @@ install:
 script: make test
 
 after_success:
-- docker tag $REPO:$COMMIT $REPO:$TAG
-- docker tag $REPO:$COMMIT $REPO:travis-$TRAVIS_BUILD_NUMBER
-- make push
+- make tag ALT_TAG=${TRAVIS_COMMIT::6}
+- make tag ALT_TAG=travis-$TRAVIS_BUILD_NUMBER
+- make hub-login
+- make hub-push
+- make hub-build

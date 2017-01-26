@@ -1,21 +1,21 @@
 FROM callforamerica/debian
 
-MAINTAINER joe <joe@valuphone.com>
+MAINTAINER Joe Black <joeblack949@gmail.com>
 
 ARG     ERLANG_VERSION
 ARG     RABBITMQ_VERSION
 
-ENV     ERLANG_VERSION=${ERLANG_VERSION:-19.2} \
-        RABBITMQ_VERSION=${RABBITMQ_VERSION:-3.6.6}
+ENV     ERLANG_VERSION=${ERLANG_VERSION:-19.2}
+ENV     RABBITMQ_VERSION=${RABBITMQ_VERSION:-3.6.6}
 
-LABEL   lang.erlang.version=$ERLANG_VERSION \
-        app.rabbitmq.version=$RABBITMQ_VERSION
+LABEL   lang.erlang.version=$ERLANG_VERSION
+LABEL   app.rabbitmq.version=$RABBITMQ_VERSION
 
 ENV     APP rabbitmq
 ENV     USER $APP
 ENV     HOME /var/lib/$APP
 
-COPY    build.sh /tmp/build.sh
+COPY    build.sh /tmp/
 RUN     /tmp/build.sh
 
 COPY    entrypoint /
@@ -23,7 +23,7 @@ COPY    entrypoint /
 ENV     ERL_MAX_PORTS 65536
 ENV     RABBITMQ_LOG_LEVEL info
 
-EXPOSE  4369 5672 15672
+EXPOSE  5672 15672
 
 VOLUME  ["/var/lib/rabbitmq/mnesia"]
 

@@ -57,6 +57,8 @@ If building and running locally, feel free to use the convenience targets in the
 
 `make shell`: exec's into the docker container interactively with tty and bash shell.
 
+`make test`: test's the launched container.
+
 *and many others...*
 
 

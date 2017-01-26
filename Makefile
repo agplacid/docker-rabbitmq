@@ -1,12 +1,17 @@
 SHELL = /bin/zsh
-SHELLFLAGS = -ilc
+SHELLFLAGS = -c
 
-NAME := $(shell basename $$PWD | cut -d'-' -f2)
-DOCKER_REPO = callforamerica
-DOCKER_TAG ?= $(DOCKER_REPO)/$(NAME):latest
+NAME := $(shell basename $(PWD) | cut -d'-' -f2)
+BRANCH ?= $(shell basename $(shell git status | head -1 | rev | cut -d" " -f1 | rev))
+ifeq ($(BRANCH),master)
+	TAG := latest
+else
+	TAG := $(BRANCH)
+endif
+DOCKER_USER ?= callforamerica
+DOCKER_IMAGE := $(DOCKER_USER)/$(NAME):$(TAG)
 
-GITHUB_REPO := $(shell basename $$PWD)
-BUILD_BRANCH = master
+BUILD_TOKEN = a74d69ad-2421-436d-99a3-53494daa853e
 
 CSHELL = bash -l
 ENV_ARGS = --env-file default.env
@@ -14,36 +19,52 @@ ENV_ARGS = --env-file default.env
 
 -include ../Makefile.inc
 
-.PHONY: all build rebuild test run launch shell launch-as-dep rmf-as-dep
-.PHONY: logs start kill stop rm rmi rmf kube-deploy kube-delete default
+.PHONY: all build rebuild tag info test run launch shell launch-as-dep
+.PHONY: rmf-as-dep logs start kill stop rm rmi rmf hub-login hub-push hub-build
+.PHONY: kube-local kube-local-rm kube-deploy kube-rm
 
 build:
-	@docker build -t $(DOCKER_TAG) --force-rm .
-	@-$(MAKE) dclean
+	@docker build -t $(DOCKER_IMAGE) --force-rm .
+	@test $(LOCAL) && $(MAKE) dclean
 
 rebuild:
-	@docker build -t $(DOCKER_TAG) --force-rm --no-cache .
-	@-$(MAKE) dclean
+	@docker build -t $(DOCKER_IMAGE) --force-rm --no-cache .
+	@test $(LOCAL) && $(MAKE) dclean
+
+tag:
+	@test $(ALT_TAG) && \
+		docker tag $(DOCKER_IMAGE) $(DOCKER_USER)/$(NAME):$(ALT_TAG)
+
+info:
+	@echo "NAME: 		$(NAME)"
+	@echo "BRANCH: 	$(BRANCH)"
+	@echo "TAG: 		$(TAG)"
+	@echo "DOCKER_USER: 	$(DOCKER_USER)"
+	@echo "DOCKER_IMAGE: 	$(DOCKER_IMAGE)"
 
 test:
-	@scripts/test-container.sh
+	@tests/run
 
 run:
-	@docker run -it --rm --name $(NAME) $(DOCKER_TAG) $(CSHELL)
+	@docker run -it --rm --name $(NAME) $(DOCKER_IMAGE) $(CSHELL)
 
 launch:
-	@docker run -d --name $(NAME) -h $(NAME) $(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_TAG)
+	@docker run -d --name $(NAME) -h $(NAME) \
+		$(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_IMAGE)
 
 shell:
 	@docker exec -ti $(NAME) $(CSHELL)
 
 launch-as-dep:
-	@docker run -d --name $(NAME)-alpha -h $(NAME) $(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_TAG)
-	@docker run -d --name $(NAME)-beta -h $(NAME) $(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_TAG)
+	@for set in alpha beta; do \
+		docker run -d --name $(NAME)-$$set -h $(NAME)-$$set \
+			$(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_IMAGE); \
+	done
 
 rmf-as-dep:
-	@docker rm -f $(NAME)-alpha
-	@docker rm -f $(NAME)-beta
+	@for set in alpha beta; do \
+		docker rm -f $(NAME)-$$set; \
+	done
 
 logs:
 	@docker logs -f $(NAME)
@@ -61,23 +82,30 @@ rm:
 	@-docker rm $(NAME)
 
 rmi:
-	@docker rmi $(DOCKER_TAG)
+	@-docker rmi $(DOCKER_IMAGE)
 
 rmf:
-	@docker rm --force $(NAME)
+	@-docker rm --force $(NAME)
 
-push:
+hub-login:
 	@docker login -u $(DOCKER_USER) -p $(DOCKER_PASS)
-	@docker push $(REPO)
+
+hub-push:
+	@docker push $(DOCKER_USER)/$(NAME)
+
+hub-build:
+	@curl -s -X POST -H "Content-Type: application/json" \
+		--data '{"docker_tag": "$(TAG)"}' \
+		https://registry.hub.docker.com/u/$(DOCKER_USER)/$(NAME)/trigger/$(BUILD_TOKEN)/
+
+kube-local:
+	@kubectl apply -f tests/manifests/local.yaml
+
+kube-local-rm:
+	@kubectl delete -f tests/manifests/local.yaml
 
 kube-deploy:
-	@kubectl create -f kubernetes/$(NAME)-service-alpha.yaml
-	@kubectl create -f kubernetes/$(NAME)-service-beta.yaml
-	@kubectl create -f kubernetes/$(NAME)-deployment-alpha.yaml --record
-	@kubectl create -f kubernetes/$(NAME)-deployment-beta.yaml --record
+	@kubectl apply -f kubernetes
 
-kube-delete:
-	@kubectl delete svc $(NAME)-alpha
-	@kubectl delete svc $(NAME)-beta
-	@kubectl delete deployment/$(NAME)-alpha
-	@kubectl delete deployment/$(NAME)-beta
+kube-rm:
+	@kubectl delete -f kubernetes

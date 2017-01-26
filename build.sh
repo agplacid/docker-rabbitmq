@@ -9,9 +9,11 @@ build::user::create $APP
 
 log::m-info "Installing erlang and $APP repos ..."
 build::apt::add-key 434975BD900CCBE4F7EE1B1ED208507CA14F4FCA
-echo 'deb http://packages.erlang-solutions.com/debian jessie contrib' > /etc/apt/sources.list.d/erlang.list
+echo 'deb http://packages.erlang-solutions.com/debian jessie contrib' > \
+    /etc/apt/sources.list.d/erlang.list
 build::apt::add-key 0A9AF2115F4687BD29803A206B73A36E6026DFCA
-echo 'deb http://www.rabbitmq.com/debian testing main' > /etc/apt/sources.list.d/rabbitmq.list
+echo 'deb http://www.rabbitmq.com/debian testing main' > \
+    /etc/apt/sources.list.d/rabbitmq.list
 apt-get -q update
 
 
