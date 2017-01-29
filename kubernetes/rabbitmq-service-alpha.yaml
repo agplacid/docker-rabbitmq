@@ -1,6 +1,6 @@
-kind: Service
 apiVersion: v1
-metadata: 
+kind: Service
+metadata:
   name: rabbitmq-alpha
   labels:
     app: rabbitmq

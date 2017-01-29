@@ -19,9 +19,9 @@ ENV_ARGS = --env-file default.env
 
 -include ../Makefile.inc
 
-.PHONY: all build rebuild tag info test run launch shell launch-as-dep
-.PHONY: rmf-as-dep logs start kill stop rm rmi rmf hub-login hub-push hub-build
-.PHONY: kube-local kube-local-rm kube-deploy kube-rm
+.PHONY: all build rebuild tag info test create-network run launch shell
+.PHONY: launch-as-dep rmf-as-dep logs start kill stop rm rmi rmf hub-login
+.PHONY: hub-push hub-build kube-local kube-local-rm kube-deploy kube-rm
 
 build:
 	@docker build -t $(DOCKER_IMAGE) --force-rm .
@@ -45,25 +45,30 @@ info:
 test:
 	@tests/run
 
+create-network:
+	@-docker network ls | awk '{print $2}' | grep -q local || docker network \
+		create local
+
 run:
-	@docker run -it --rm --name $(NAME) $(DOCKER_IMAGE) $(CSHELL)
+	@docker run -it --rm --name $(NAME) --network local $(DOCKER_IMAGE) \
+		$(CSHELL)
 
 launch:
 	@docker run -d --name $(NAME) -h $(NAME) \
-		$(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_IMAGE)
+		$(ENV_ARGS) $(VOLUME_ARGS) --network local $(DOCKER_IMAGE)
 
 shell:
 	@docker exec -ti $(NAME) $(CSHELL)
 
 launch-as-dep:
 	@for set in alpha beta; do \
-		docker run -d --name $(NAME)-$$set -h $(NAME)-$$set \
-			$(ENV_ARGS) $(VOLUME_ARGS) $(DOCKER_IMAGE); \
+		docker run -d --name $(NAME)-$$set -h $(NAME)-$${set}.local \
+			$(ENV_ARGS) $(VOLUME_ARGS) --network local $(DOCKER_IMAGE); \
 	done
 
 rmf-as-dep:
 	@for set in alpha beta; do \
-		docker rm -f $(NAME)-$$set; \
+		docker rm -f $(NAME)-$${set}; \
 	done
 
 logs:
