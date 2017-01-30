@@ -46,7 +46,7 @@ test:
 	@tests/run
 
 create-network:
-	@-docker docker network create local
+	@-docker network create local
 
 run:
 	@docker run -it --rm --name $(NAME) --network local $(DOCKER_IMAGE) \
