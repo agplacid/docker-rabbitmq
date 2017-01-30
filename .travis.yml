@@ -37,3 +37,120 @@ after_success:
 - make hub-login
 - make hub-push
 - make hub-build
+addons:
+  apt:
+    packages:
+    - zsh
+services: docker
+env:
+  global:
+  - DOCKER_USER=callforamerica
+  # DOCKER_PASS
+  - secure: "WvO6U2+DnmRtKWrmtyTdFZnzmeva0xf64bSx+QMmZE9KXIHfsRebBIOpdPI69xM8jVNn8tsfT63wHDIAtSkGQ2Pjht5C4+kiWqSZ9kclBGoueo69drdwCU04yp2GNmDCXgXZMQBEnUdxYq8xe3mYsVp52EIB9T3kZdu/QPIlGik8G5aITSYJuRW+tziphGEc9ram9nrIMTHzcXSfA/PxX+R9GdsGhYDbWerdb/ZDmmnleCEVY7U1oeQQpYQ8dPZud3OVYMgtc8Z84xj+PFwEcbJnjt+ugzC2sF/ZeVrY15HGGRMvMJNU29HREo3RlWZF2GFTUEiWe+Wg5aP2xl51LbpwmWd8qXy/9pVahkrApWXgMjEr5jJGw14DmwQCTVuIIA7m119cGwEFWlBtit2E474NssnWaRcETUoC9mWpibvcz3f5a8WUbPdn/m3LPjKPvMD76bjorBhQSLiLPOQchZEZY5QeWjALgIxDBlCmQLsMBLLOnUl09I+12bmfhi8BVcIBY2SeiASilvjPYHEBZKI1tYfDgB5CcBMbZA+x8OU/EuwU4Z9tQxEET/ZUb0EMBc64BvsMaKUsV/N4JCC0eobXu1grquqdrm/AtsbrA2ZVMvsf/PCnwy1prPJrvaYHtZPzHENuJSuy7uI2HRPf78Ir7EBzqTfdmV3vl3Khxdw="
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+  slack:
+    rooms:
+    - secure: "KbotVpeiDPOfznSH5lrBTWN2VW/q3k84k8v7ei0iU/d6EYX1VmFTGgXAXqcmX7LuA+FBTxfwbgCv69e76EI1GNGmDTsfCFNwcrH/kBIPVCcrG10P5UAIxcMbHcXfWWXB4a6muB5ZnhSTWp8dw/+ACGfVjWnW3Do6V2h2pZGwH0mTlEL0cSJY2UKjH5ilBpu5StzRKbFfm9mKQGqwowSBTuHEmjXN/EUK4MCOSgqnQudi5FWRe1krm7bSIQe5S8pO5qh29fTKaBuPk+RYGFMXad1XXKIafISNj9gZ+0L8rvXZTdIGQCboGzB4ICYJn3i6LqcW3KP1NS+BvqU0hC4TXtBNbSnnf8OJdAkpkwO+jAMM70VvngvMwiX5bG2lFHjkuWtYUEinjXKW1ImRIyokDi2os9S0+XvZcKnEDNCbpMMJwV0FDeYSlyKdYjcX6r5qdHwzOwN3OF+EoyC1p9v4hKbSj+UjiwLD4Mf7S6K58RUngMatmBTcVf0evCIZm6Jc5jPGVHgU0wCIBNJXTSbz87IA1PgLvTet1VNbu22mnWyDBXgMvmOdGCOf7KAvRCbNhWcLr0DFFDPSOw5F5QU7G8n+D8g05WvDeETMgSU1gbgt3+2eg5dB1UWjOs6We+aQxMdHALOWSp7p7ANSWyIy+6xraPNwvC7nH/xAnEz7pyw="
+    on_success: always
+    on_failure: always
+
+before_install:
+- source scripts/ci-env.sh
+- make info
+
+install:
+- make build
+- make launch
+
+script:
+- sleep 10
+- make test
+
+after_success:
+- make tag ALT_TAG=${TRAVIS_COMMIT::6}
+- make tag ALT_TAG=travis-$TRAVIS_BUILD_NUMBER
+- make hub-login
+- make hub-push
+- make hub-build
+
+addons:
+  apt:
+    packages:
+    - zsh
+services: docker
+env:
+  global:
+  - DOCKER_USER=callforamerica
+  # DOCKER_PASS
+  - secure: "0dN4hJZ4uUfUbqtMWGBzyaoSUjrqlBkMzoeAELYih4FJ8miBynV/Iv0R4umSeZNrbS+sE0+F10oFoxvHaGT7rcX34KwBQD/A28HtKqLQE36u3H1ua7pNomFa37eO7mmMzRwit3pGqgFKMMO6hfxILENt5dTn4jwcsz4DO5ZOuZ3snO6LCJMO5Sp1fzMB38lT6DQPnfFcBj1rwyglDRxb3vSsvsw9pUjKdM0a5qYuoKHboPHoYGribj7eGeSmfwvDojT2WZw3VeoYkJ6CUVgdKRgMw/FE8ZgTsoCFFKfLoHxnyXodzqcta/C8xsLVNRkP+DwPS2J1JxgUWdBUTOY7jmdxz7g1GnNAw+sxaWX8AUD1iHI3Q6AA75BYeXnOhTPsvjtNQVG8USJ39JrVy/vHpFTCqZg2QvzxVO4sgOMmHN/Kcsi8BJ5LCqjsUgv0im91nk4DSbah7TwlxE7omRqcUm0xW3SRhXQX/k7PZ3QnQJDo5H+dXqBC6l4xc463qtC2zO4BBw3Bm6FenG7mIjFVxuwvKkvCo4B0YOOx5eaXwjfQ4XsA4EoWxXrv1Ci9eQSXi9oYmk3wUgoQbn/7/Fh/RgxFT/8kmzA6QV4iP3imMWJSmrxX2R9ykK6BHLgtEiKZPx/ApJcJfLxXimAfkt/NqbpmafUz/fno88S1uEwKY6A="
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+  slack:
+    rooms:
+    - secure: "ml2E3lbdQxhNDqgUYFOgGLFUVIVv5TARa0y+n79ZTp89U4NE07lTz5B4fRsgF8pMSpFOXvh6WoOZTxOxllWBJMaW10YY7b4xqVYBxmYMe7KOyQQVvAI2N98cG36L3iaSLzPMlMLvzc54ArMJSQI9W2vs4QxZhYvqJ/21xR1iX6MFkVZs0YIlXwmsYJhQKLpGHWl6PBznP2g/oFXnBV+szfvsdxC4AzSGD7D7tyZDC1M85/+cRYmtIbeKCI37zZSfpAPAZV+hOQTYZ3ZIjyM0nxURl8a8YtxZ2Hiw1bbc7C0aAfqkPSo31T3TCpWfiwd+4SLYtQuKYtR/Lk0wq+gNm+ByWmkyTgjbIhcJBCvTeiQ5uHOC9a1k0Op2ThJQaJqexvgsD8ttk+/pc6p4xI6oktw8mCGMxEIZkLMsmOiUpkBfVCU23PrBH3mzYDg2cQwoy1lGkOLeQqB1JPudLC7OiUe22I37M45pjpPLlsf/2Mu3lknfQyWIh4k7ofDDaqn/K0RsUXO0D/+8xmAQcgGJB1Q1oK1o/VbuHLLXQXv9SHeGwsZFwqnl/6iGHAXgdhWG3P1XLRFn/t0mYve56xYkXBSNs0SngpUQPfKVAflGHqQN6tDbI8pbmnSHtiLZI/NAPwPGDKYESpBStnNsJ8C2vhZ2scjKfMxonrL4V9WUzPM="
+    on_success: always
+    on_failure: always
+
+before_install:
+- source scripts/ci-env.sh
+- make info
+
+install:
+- make build
+- make launch
+
+script:
+- sleep 10
+- make test
+
+after_success:
+- make tag ALT_TAG=${TRAVIS_COMMIT::6}
+- make tag ALT_TAG=travis-$TRAVIS_BUILD_NUMBER
+- make hub-login
+- make hub-push
+- make hub-build
+
+addons:
+  apt:
+    packages:
+    - zsh
+services: docker
+env:
+  global:
+  - DOCKER_USER=callforamerica
+  # DOCKER_PASS
+  - secure: "SRL61KS5Rp6Lb/DFVpusOGiEYdmN4NEllsCryn4v/sdU1f2SgYg1WQAkbwn1G8n/tBw2UGNmOx1qYDhmQClLLcSjyeZn/a1JtoBWS7IERxUQpDPA4WTcDVaRLIrSxp8B6+t2612cnGjpToNKn1E67OoYq8zTupf+ikiZI/ugIi8oF35WLsyYbQqLp9i4N4LVxbLSxZNQPdKq7dncpFksc7vMNlQPa+iLo8TTuH8UqpY8iGUERWwHfC2qi5YfwdYjtfTrzZOiE/zy/TNKFZ2/LWBuoedBFmPB5wcs32Exy6y5yCWMGZYnN2h2U02D5TBT5gAeIhsHp27B49zrJeWWmr6ZV4W2q5bwnNutVQlkopg2A8vhJs6HaQSXJ9Y95PAxZhxB/XwWcuAfyHJg9SL02p7CilZSDmEP7sD/g6XlFg8MjdigOLmXkq6WTSSPqG76UpHUr9InDh/co3DeNKlSbeeos9+WXpGFUCDOaB/x2LgWwUAtTJcK+iuE8d9KI5KqtimHu1GkSVo6LlE/deB0VnuNFgV6mFZzs5ApTVGDvTSmu5tmaNNH6z63YyDaaDXH8kErktsQb2ZnQOFY7ttLK+wtMR6bV9foopV+zgakO1TX5x4CnmMrqP2oImtA7SYvok/PzkKiz+tkHh8+r8TaBsOeaY2cNVBURKekgTy2ZwU="
+notifications:
+  email:
+    on_success: never
+    on_failure: always
+  slack:
+    rooms:
+    - secure: "1foPu3GARoh1zGhd0/fozCr0miL4TAv5kStQBdmvXFrrMNzp/Gby8mCtIz3h8QuPbAiPWMfH3ncZYCbbGrIMqxP7qTTbozlWeY4V4SrEt1CtzY67am0RapbniPlFI3nCxzly6BAb5uK1kssyxfeSzLQlZSkh00Y2i/hDOZOiDKVqX5jFccfN8su/Pn27EshRjg92Ge2o3/KgC1/J3fGZqs2O3jAu+ArbvlXoDfLA3Ft4r0JTqzLKQx8d/7vEoKH3qOlzbY7XwmOGohVxut/qyjlJo0s94yqkcqbbbM9GeDmQb+Mi1juvYIHefE2R8wBR5YLyvPMdtQzYSxaIqTN5fUHPiuJO2EJYdR6wYwT1w7FY6qcT9n2YCCdhtxoRVXg2I3pD2gt8NmFdVOkthrcgCVwqyT+RIQOq/melqumPHEwgupggFVQ+/XrGlQ3JI2PZUsyX/BMQJ41HpLELhH70DhhP22mAcH63ONj+u4BvtYhQyXtCWGRiUJWEmNN7dYbIwxawmhTR8uL+ENYU2JRWvAQJm8NGcUsoxhyqZLn8WNBpPRw5RIic8SMwlOXJwPjtggBV9Ikbd+Q8uuVdRViHbO/n875Lv3rwUkrJ5/ogR1hscCeqyZAXVEnz3KawYIRahGBY50dwZWZbc5FWSuvx+cuGIeBYAkeXE1n3Yh1bWzk="
+    on_success: always
+    on_failure: always
+
+before_install:
+- source scripts/ci-env.sh
+- make info
+
+install:
+- make build
+- make launch
+
+script:
+- sleep 10
+- make test
+
+after_success:
+- make tag ALT_TAG=${TRAVIS_COMMIT::6}
+- make tag ALT_TAG=travis-$TRAVIS_BUILD_NUMBER
+- make hub-login
+- make hub-push
+- make hub-build
+
