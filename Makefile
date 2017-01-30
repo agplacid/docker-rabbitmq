@@ -16,6 +16,7 @@ BUILD_TOKEN = a74d69ad-2421-436d-99a3-53494daa853e
 CSHELL = bash -l
 ENV_ARGS = --env-file default.env
 # VOLUME_ARGS = --tmpfs /var/lib/rabbitmq/mnesia:size=128M
+NETWORK_ARGS = --network local
 
 -include ../Makefile.inc
 
@@ -49,12 +50,12 @@ create-network:
 	@-docker network create local
 
 run:
-	@docker run -it --rm --name $(NAME) --network local $(DOCKER_IMAGE) \
+	@docker run -it --rm --name $(NAME) $(NETWORK_ARGS) $(DOCKER_IMAGE) \
 		$(CSHELL)
 
 launch:
 	@docker run -d --name $(NAME) -h $(NAME) \
-		$(ENV_ARGS) $(VOLUME_ARGS) --network local $(DOCKER_IMAGE)
+		$(ENV_ARGS) $(VOLUME_ARGS) $(NETWORK_ARGS) $(DOCKER_IMAGE)
 
 shell:
 	@docker exec -ti $(NAME) $(CSHELL)
@@ -62,7 +63,7 @@ shell:
 launch-as-dep:
 	@for set in alpha beta; do \
 		docker run -d --name $(NAME)-$$set -h $(NAME)-$${set}.local \
-			$(ENV_ARGS) $(VOLUME_ARGS) --network local $(DOCKER_IMAGE); \
+			$(ENV_ARGS) $(VOLUME_ARGS) $(NETWORK_ARGS) $(DOCKER_IMAGE); \
 	done
 
 rmf-as-dep:
