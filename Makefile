@@ -46,8 +46,7 @@ test:
 	@tests/run
 
 create-network:
-	@-docker network ls | awk '{print $2}' | grep -q local || docker network \
-		create local
+	@-docker docker network create local
 
 run:
 	@docker run -it --rm --name $(NAME) --network local $(DOCKER_IMAGE) \
