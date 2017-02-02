@@ -46,7 +46,7 @@ function tag {
     local name=$(get-name)
     local user=$(get-user)
     local image=$(get-docker-image)
-    docker tag $image $user/$name:$alt_tag
+    docker tag $image $user/$name:$new_tag
 }
 
 function hub-push {
@@ -62,7 +62,7 @@ function hub-push {
 
 function hub-trigger {
     if [[ -z $BUILD_TOKEN ]]; then
-        printf 'BUILD_TOKEN not set.'
+        printf 'BUILD_TOKEN not set.\n'
         return 1
     fi
     local name=$(get-name)
@@ -95,8 +95,8 @@ function ci-tag-build {
     tag travis-$TRAVIS_BUILD_NUMBER
 }
 
-if [[ -f $(dirname $0)/vars.env ]]; then
-    source $(dirname $0)/vars.env
+if [[ -f scripts/ci/vars.env ]]; then
+    source scripts/ci/vars.env
 fi
 
 export NAME=$(get-name)
