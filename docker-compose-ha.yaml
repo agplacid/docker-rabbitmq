@@ -1,0 +1,33 @@
+version: '2.1'
+services:
+  rabbitmq-alpha:
+    extends:
+      file: docker-compose.yaml
+      service: rabbitmq
+    container_name: rabbitmq-alpha
+    hostname: rabbitmq-alpha.local
+    image: "callforamerica/rabbitmq:latest"
+    volumes:
+    - data-rabbitmq-alpha:/var/lib/rabbitmq/mnesia
+    networks:
+      local:
+        aliases:
+        - rabbitmq-alpha.local
+  rabbitmq-beta:
+    extends:
+      file: docker-compose.yaml
+      service: rabbitmq
+    container_name: rabbitmq-beta
+    hostname: rabbitmq-beta.local
+    image: "callforamerica/rabbitmq:latest"
+    volumes:
+    - data-rabbitmq-beta:/var/lib/rabbitmq/mnesia
+    networks:
+      local:
+        aliases:
+        - rabbitmq-beta.local
+networks:
+  local:
+volumes:
+  data-rabbitmq-alpha:
+  data-rabbitmq-beta:

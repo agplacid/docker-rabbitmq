@@ -29,5 +29,9 @@ VOLUME  ["/var/lib/rabbitmq/mnesia"]
 
 WORKDIR $HOME
 
+SHELL       ["/bin/bash"]
+HEALTHCHECK --interval=15s --timeout=5s \
+    CMD rabbitmqctl node_health_check | grep -q '^Health check passed' || exit 1
+
 ENTRYPOINT  ["/dumb-init", "--"]
 CMD         ["/entrypoint"]
