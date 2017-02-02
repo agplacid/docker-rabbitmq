@@ -1,3 +1,4 @@
+language: python
 services: docker
 env:
   global:
@@ -14,7 +15,9 @@ notifications:
     on_success: always
     on_failure: always
 
-before_install: source scripts/ci/environment.sh
+before_install:
+- pip install --upgrade docker-compose
+- source scripts/ci/environment.sh
 
 install: docker-compose build
 
