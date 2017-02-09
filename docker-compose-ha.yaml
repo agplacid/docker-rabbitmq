@@ -7,8 +7,6 @@ services:
     container_name: rabbitmq-alpha
     hostname: rabbitmq-alpha.local
     image: "callforamerica/rabbitmq:latest"
-    volumes:
-    - data-rabbitmq-alpha:/var/lib/rabbitmq/mnesia
     networks:
       local:
         aliases:
@@ -20,14 +18,9 @@ services:
     container_name: rabbitmq-beta
     hostname: rabbitmq-beta.local
     image: "callforamerica/rabbitmq:latest"
-    volumes:
-    - data-rabbitmq-beta:/var/lib/rabbitmq/mnesia
     networks:
       local:
         aliases:
         - rabbitmq-beta.local
 networks:
   local:
-volumes:
-  data-rabbitmq-alpha:
-  data-rabbitmq-beta:

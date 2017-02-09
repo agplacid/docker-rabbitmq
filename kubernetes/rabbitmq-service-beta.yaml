@@ -15,8 +15,6 @@ spec:
     environment: production
   ports:
     - name: amqp
-      protocol: TCP
       port: 5672
     - name: admin
-      protocol: TCP
       port: 15672

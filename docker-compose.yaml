@@ -6,13 +6,9 @@ services:
     build: .
     image: "callforamerica/rabbitmq:${TAG:-latest}"
     env_file: default.env
-    volumes:
-    - data-rabbitmq:/var/lib/rabbitmq/mnesia
     networks:
       local:
         aliases:
         - rabbitmq.local
 networks:
   local:
-volumes:
-  data-rabbitmq:

@@ -8,5 +8,6 @@ metadata:
     environment: production
 data:
   kube.hostname.fix: 'true'
-  kube.hostname.short: 'true'
+  kube.use-long-hostname: 'true'
   rabbitmq.log.level: info
+  rabbitmq.use-longname: 'true'
