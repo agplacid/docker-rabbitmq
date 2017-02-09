@@ -49,6 +49,10 @@ erlang::set-erl-dump
 EOF
 
 
+log::m-info "Adding fix to ensure long hostnames work correctly ..."
+echo 'unset HOSTNAME' >> /etc/profile.d/40-fix-hostname.sh
+
+
 log::m-info "Cleaning up unnecessary files ..."
 rm -rf \
     /usr/share/doc/rabbitmq-server \
