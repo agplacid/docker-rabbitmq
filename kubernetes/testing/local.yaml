@@ -129,7 +129,7 @@ spec:
           timeoutSeconds: 10
         livenessProbe:
           exec:
-            command: ["rabbitmqctl", "node_health_check", "|", "grep", "-q", "'^Health check passed'"]
+            command: ["/bin/bash", "-lc", "rabbitmqctl node_health_check | grep -q '^Health check passed'"]
           initialDelaySeconds: 10
           timeoutSeconds: 5
       volumes:
