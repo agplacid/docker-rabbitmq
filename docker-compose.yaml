@@ -3,9 +3,12 @@ services:
   rabbitmq:
     container_name: rabbitmq
     hostname: rabbitmq.local
+    environment:
+      ERLANG_COOKIE: test-cookie
+      RABBITMQ_USE_LONGNAME: 'true'
     build: .
     image: "callforamerica/rabbitmq:${TAG:-latest}"
-    env_file: default.env
+    # env_file: default.env
     networks:
       local:
         aliases:
