@@ -1,13 +1,14 @@
 # RabbitMQ (stable) w/ Kubernetes fixes & manifests
 
-[![Build Status](https://travis-ci.org/sip-li/docker-rabbitmq.svg?branch=master)](https://travis-ci.org/sip-li/docker-rabbitmq) [![Docker Pulls](https://img.shields.io/docker/pulls/callforamerica/rabbitmq.svg)](https://hub.docker.com/r/callforamerica/rabbitmq) [![Size/Layers](https://images.microbadger.com/badges/image/callforamerica/rabbitmq.svg)](https://microbadger.com/images/callforamerica/rabbitmq)
+[![Build Status](https://travis-ci.org/telephoneorg/docker-rabbitmq.svg?branch=master)](https://travis-ci.org/telephoneorg/docker-rabbitmq) [![Docker Pulls](https://img.shields.io/docker/pulls/telephoneorg/rabbitmq.svg)](https://hub.docker.com/r/telephoneorg/rabbitmq) [![Size/Layers](https://images.microbadger.com/badges/image/telephoneorg/rabbitmq.svg)](https://microbadger.com/images/telephoneorg/rabbitmq) [![Github Repo](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/telephoneorg/docker-rabbitmq)
+
 
 ## Maintainer
-Joe Black | <joe@valuphone.com> | [github](https://github.com/joeblackwaslike)
+Joe Black | <me@joeblack.nyc> | [github](https://github.com/joeblackwaslike)
 
 
 ## Description
-Minimal image with one plugin *(rabbitmq-management)*.  This image uses a custom version of Debian Linux (Jessie) that I designed weighing in at ~22MB compressed.
+Minimal image with one plugin *(rabbitmq-management)*.  This image uses a custom, minimal version of Debian Linux.
 
 
 ## Build Environment
@@ -38,9 +39,9 @@ ref: https://www.rabbitmq.com/configure.html
 All of our docker-* repos in github have CI pipelines that push to docker cloud/hub.  
 
 This image is available at:
-*  [https://hub.docker.com/r/callforamerica/rabbitmq](https://hub.docker.com/r/callforamerica/).
-* [https://store.docker.com/community/images/callforamerica/rabbitmq](https://store.docker.com/community/images/callforamerica/rabbitmq)
-* `docker pull callforamerica/rabbitmq`
+* https://hub.docker.com/r/telephoneorg/rabbitmq
+* https://store.docker.com/community/images/telephoneorg/rabbitmq
+* `docker pull telephoneorg/rabbitmq`
 
 To run:
 
@@ -50,7 +51,7 @@ docker run -d \
     -h rabbitmq \
     -e "ERLANG_COOKIE=test-cookie" \
     -e "RABBITMQ_USE_LONGNAME=true" \
-    callforamerica/rabbitmq
+    telephoneorg/rabbitmq
 ```
 
 **NOTE:** Please reference the Run Environment section for a list of available environment variables.
@@ -77,12 +78,12 @@ Edit the manifests under `kubernetes/<environment>` to reflect your specific env
 
 Create a secret for the erlang cookie:
 ```bash
-kubectl create secret generic erlang-cookie --from-literal=erlang.cookie=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 64)
+kubectl create secret generic erlang --from-literal=erlang.cookie=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 64)
 ```
 
 Create a secret for the rabbitmq credentials:
 ```bash
-kubectl create secret generic rabbitmq-creds --from-literal=rabbitmq.user=$(sed $(perl -e "print int rand(99999)")"q;d" /usr/share/dict/words) --from-literal=rabbitmq.pass=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 32)
+kubectl create secret generic rabbitmq --from-literal=rabbitmq.user=$(sed $(perl -e "print int rand(99999)")"q;d" /usr/share/dict/words) --from-literal=rabbitmq.pass=$(LC_ALL=C tr -cd '[:alnum:]' < /dev/urandom | head -c 32)
 ```
 
 Deploy rabbitmq:

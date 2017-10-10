@@ -1,6 +1,6 @@
-FROM callforamerica/debian
+FROM telephoneorg/debian:stretch
 
-MAINTAINER Joe Black <joeblack949@gmail.com>
+MAINTAINER Joe Black <me@joeblack.nyc>
 
 ARG     ERLANG_VERSION
 ARG     RABBITMQ_VERSION
@@ -29,7 +29,7 @@ VOLUME  ["/var/lib/rabbitmq/mnesia"]
 
 WORKDIR $HOME
 
-SHELL       ["/bin/bash"]
+SHELL       ["/bin/bash", "-lc"]
 HEALTHCHECK --interval=15s --timeout=5s \
     CMD bash -lc "rabbitmqctl node_health_check | grep -q '^Health check passed' || exit 1"
 

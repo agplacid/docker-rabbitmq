@@ -1,32 +1,35 @@
 language: python
+python:
+- "3.6"
 services: docker
 env:
   global:
-  - DOCKER_USER=callforamerica
+  - GITHUB_USER=joeblackwaslike
+  - GITHUB_ORG=telephoneorg
+  - DOCKER_USER=joeblackwaslike
+  - DOCKER_ORG=telephoneorg
   # DOCKER_PASS
-  - secure: "zhxZ4oUaZvBYXLyGkA4iq870R2uJhP31A8UeBrwSy9xb3DvPMo0fn3QW4bXjEjfR3c3JbhCgIKqpqw5cBOJe8XF9sz6vwfxj1Zliqwi+FrKDDeuaBOIvX/sBnyPEcl2tF4rg3RJAD/1IURphsFnoyBBgjfh4EdLg9sGEBEQSQJwD/rb3nHm2TgXbWBJKAxJMd24pBlgwaxf/tG3QJ2H40d3Vdd5XHtK2qtyy0mWY7O/wI52B2Pb7K26CB/LbpVifZ9glhW7jqZboJwVM8FXFLuvtdOKS0D09Kkd+FVLSIzGMBUqX5VmalwWkriY11zM7OifrR0/c7X1jHHWrbLY1FZPXr1gQUbWjpq9NX0ZXnPvKiXF339q9266N8VN5rJ8rlNnLUrpJz16qvzK+ni0YF1Di37T2gVEgVd4FnZgOxjHp7aegqEWpB/CWIAnGUWjBhizC2X8rSXZKvuAbHy5L8uZlQuslRxkk5NjUt7+wlmWF6dp0ie7PRwblBLM+pzoxte/tOXkPpJE3xiBMujbc/CsPAi1+vr43nZmRkkkqTht85wHpmbJI1hT8zbi+BfN4+Xhhus9lmWUWI04tx9CT8/0ZqIn/s3If+Yixj/GENr54swU0ywJNtWIWMUDkE+/YZ5W1bODj7QtKWZc1dHD823WITsI3m5Zp29fIMrWneho="
+  - secure: "VB+LD381ay/sUPLJYIMDJQcxZgpJ7N8Pmir5nEwos2gTZs6OdJ7VPv8pQ1PQvqZEmj+YBmGDkUcypse+TuaXqPlDzKwwgSLa7P05rhqj7DZhjiPBmftPe1P39kqPHS5l+nfpA76yFfnuL98MOknjUmVRaBFfAX0BHVhZdXYd+2ac05p8eMqkpvyVp4wobpeD1c4VOv779R5IfNywOJLaUWw6VGM/gX6juCe1wUpdFxqHJZRb6+le9LuVqXQg+R9tKBrW73/SLCAKJsWUEUjl4DAjZ4QmSimWtubHgg9WOQweJfTON/dRTQ1Q2Na0wOVvsehLkIiwycUYRGKG7aox3Bc7mzdbBz8+bLpchf6xuZsjE8X6i5xsjT+0mhPh8ef682kl/kK/AxmedQfy9rPQHHlfU3lj7uj0ICdnj9vJ112hhEU6jlaClOTVPwq7krnh6vy/4W1gv8dHaWiB6pvLwtjhszg+ZlbAgzvW3XuDqEgPE6Asr7d+bsKANaQZO+puL5MtXwQi8fEpszP/mAlCCZf9yfTVWAE+j6adLnC+z9ueKLJUGyqrRijVZekn8dThu95YWuzR/4xnPBWI56YkMmjYNK1hc8cJW9qtBO6osSOL3F1Xfw2QFyhl/ozdOHnCgGKRLhXfhz4+7sCTElWxQ3LKq5U+SXQUGx2fmPWy8T8="
 notifications:
   email:
     on_success: never
     on_failure: always
   slack:
     rooms:
-    - secure: "wWHG1V9UWtnw1FzhiB4ZIHsI3DHFek7Tck5Ud+vRppAUqLEFuaMthr1vYii4tzlQUouaybEhpxPIveTjM6PuhXSBARQlJ5kElWbcWcEyEafG/t8+dT2VuHxhI/i+BRPikT3a9slvpPWSCbwW2OAL8ktM+N57Wdw19iZMhw9/RVdvMJhVzbHN4XAw0F12bW7NjBB/IKe74bS340IvZg0fupSKdjJQ/kBWI8uUqRROBjd2CNMTiMam9BTcID6TwJ9KGLBClHer47rOyUhf+4e0oe0fx2iL5GjX2+LUd06sME1uTlQq/VhWCfIBdNF1hVBwe9eJMPepR3VSFwPom/EkRMA5nY7EtHxxmKDWd/dbaOZXNYJvQ42fZJSD7HfUncBS4x2q0UKV7QE5W10JDayA6SfZ8Z05ZH2W3IT5Mo81xZkC0nCCXUmryThrJKYMsLo70TPZ2ji4jC+QIuaP3PPlVy0ZBijWfRMqDuNR0VAKpmsgpcW5RqQeFpQDqCm8LLhxmvBeU4RDsMOIH1Kc4yq78kP9tCJ6EwWR4ut7meuDCir+cTdsSJ75RjLfLh+gwUf+QLQg9nTzpJyslojb/Xgsy/7Qc+CA3Xr3c1uq95TT6oG6QvTuYYv41c9K5KWpJ2b6n3W7s2xb/OqpDozQlTdBtV0Rn8m2FJmKs44k3Qmz8iE="
+    - secure: "duJq/GgRQoOL6uR4DMewYO03RF6VAWHu2VUcMM6HROR5JV2cTNCFAoV/c5Cn/mLtY9OrZKhAnzEOQOvyZQAaIYHQ/f5x2UcB9uAqMQJN84cRRbN9iGLC+9qBOFFYeRc6WfCu8Om3M0y87CKlHdkbyK9wAHWieoKrvqq04zJgJQ7EclvVABXC0U6nUcJKc1/w2mA2LTRK3g0Yd2dvbQG4Frpp/u/5yRf4i6V9yAKnZKRj7UUZm5JiCbT76gSO9icd1/BuFXztfahc7PpPdWK8oAVnLnsCO0qIcVVMUDngZQK9OIqaL4Ine5VkIbf5dLeZwabu8m627ldO+TpDNM3bK0du+PmpCWkwSEr83d0OWADm45vLPeV0Yn1hO45UBrx2E91sNWAKtkndBrP4yr6Ef4KVFF68k1DJ3JaGWG+oKhUXZOWGsAO5i3cRE9tPj3QQck+tvzKE045Oo/Gn4idfi/BbHir8TY7lnttjj4q+I20fKkwDSEgoK9J7WlXqzmS2/z5rWAGzB8/nLILm2uA6a/vbrKSsguOTDDkRHYkzD0lYquMX+HRtlYSreg++0gGbBSEdQZkZtayUGjKHndQaZLNG9eYybOsUPv0uibpwv29W+zxwHmJhh1HakIjhYoQQuja+uV3AyGS9hg101xd+H6iA7hFE+H7ofCCiHuqWRt0="
     on_success: always
     on_failure: always
 
 before_install:
-- pip install --upgrade docker-compose
 - source scripts/ci/environment.sh
+- pip install --upgrade docker-compose
+- pip install invoke
 
-install: docker-compose build
+install: inv dc.build
 
-before_script:
-- docker-compose up -d
-- sleep 10
-
-script: tests/run
+script: inv test
 
 after_success:
 - ci-tag-build
 - hub-push
+- hub-update-readme

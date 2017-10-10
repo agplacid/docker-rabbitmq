@@ -5,13 +5,13 @@ metadata:
   labels:
     app: rabbitmq
     set: alpha
-    project: valuphone
+    project: telephoneorg
     environment: production
 spec:
   selector:
     app: rabbitmq
     set: alpha
-    project: valuphone
+    project: telephoneorg
     environment: production
   ports:
     - name: amqp

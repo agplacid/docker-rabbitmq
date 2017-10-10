@@ -8,10 +8,11 @@ eval $(detect-proxy enable)
 build::user::create $APP
 
 log::m-info "Installing erlang and $APP repos ..."
-build::apt::add-key 434975BD900CCBE4F7EE1B1ED208507CA14F4FCA
-echo 'deb http://packages.erlang-solutions.com/debian jessie contrib' > \
-    /etc/apt/sources.list.d/erlang.list
-build::apt::add-key 0A9AF2115F4687BD29803A206B73A36E6026DFCA
+# build::apt::add-key 434975BD900CCBE4F7EE1B1ED208507CA14F4FCA
+# echo 'deb http://packages.erlang-solutions.com/debian jessie contrib' > \
+#     /etc/apt/sources.list.d/erlang.list
+# build::apt::add-key 0A9AF2115F4687BD29803A206B73A36E6026DFCA
+
 echo 'deb http://www.rabbitmq.com/debian testing main' > \
     /etc/apt/sources.list.d/rabbitmq.list
 apt-get -q update
@@ -52,6 +53,12 @@ EOF
 log::m-info "Adding fix to ensure long hostnames work correctly ..."
 echo 'unset HOSTNAME' >> /etc/profile.d/40-fix-hostname.sh
 
+tee /etc/profile.d/60-${APP}-long-name.sh <<'EOF'
+if [[ $USE_LONG_HOSTNAME == true || $ERLANG_HOSTNAME == 'long' || $KUBE_HOSTNAME == 'long' ]]; then
+    export RABBITMQ_USE_LONGNAME=true
+fi
+EOF
+
 
 log::m-info "Cleaning up unnecessary files ..."
 rm -rf \
@@ -60,7 +67,7 @@ rm -rf \
     /lib/systemd/system/rabbitmq-server.service
 
 
-log::m-info "Setting permissions ..."
+log::m-info "Setting ownership & permissions ..."
 chown -R $USER:$USER ~ /etc/rabbitmq /var/lib/rabbitmq /usr/local/bin
 
 

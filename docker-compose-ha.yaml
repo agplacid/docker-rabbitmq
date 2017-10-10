@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.2'
 services:
   rabbitmq-alpha:
     extends:
@@ -6,7 +6,6 @@ services:
       service: rabbitmq
     container_name: rabbitmq-alpha
     hostname: rabbitmq-alpha.local
-    image: "callforamerica/rabbitmq:latest"
     networks:
       local:
         aliases:
@@ -17,7 +16,6 @@ services:
       service: rabbitmq
     container_name: rabbitmq-beta
     hostname: rabbitmq-beta.local
-    image: "callforamerica/rabbitmq:latest"
     networks:
       local:
         aliases:

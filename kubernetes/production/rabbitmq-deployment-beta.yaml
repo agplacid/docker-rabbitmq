@@ -9,29 +9,24 @@ spec:
       labels:
         app: rabbitmq
         set: beta
-        project: valuphone
+        project: telephoneorg
         environment: production
     spec:
       containers:
       - name: rabbitmq
-        image: callforamerica/rabbitmq
+        image: telephoneorg/rabbitmq:latest
         imagePullPolicy: Always
         env:
+        - name: ERLANG_HOSTNAME
+          valueFrom:
+            configMapKeyRef:
+              name: rabbitmq
+              key: erlang.hostname
         - name: KUBE_HOSTNAME_FIX
           valueFrom:
             configMapKeyRef:
               name: rabbitmq
               key: kube.hostname.fix
-        - name: RABBITMQ_USE_LONGNAME
-          valueFrom:
-            configMapKeyRef:
-              name: rabbitmq
-              key: rabbitmq.use-longname
-        - name: USE_LONG_HOSTNAME
-          valueFrom:
-            configMapKeyRef:
-              name: rabbitmq
-              key: kube.use-long-hostname
         - name: RABBITMQ_LOG_LEVEL
           valueFrom:
             configMapKeyRef:
@@ -40,17 +35,17 @@ spec:
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
             secretKeyRef:
-              name: rabbitmq-creds
+              name: rabbitmq
               key: rabbitmq.user
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
-              name: rabbitmq-creds
+              name: rabbitmq
               key: rabbitmq.pass
         - name: ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
-              name: erlang-cookie
+              name: erlang
               key: erlang.cookie
         ports:
         - name: amqp

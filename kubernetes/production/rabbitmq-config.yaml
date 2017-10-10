@@ -7,7 +7,6 @@ metadata:
     project: valuphone
     environment: production
 data:
+  erlang.hostname: long
   kube.hostname.fix: 'true'
-  kube.use-long-hostname: 'true'
   rabbitmq.log.level: info
-  rabbitmq.use-longname: 'true'

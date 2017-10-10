@@ -15,9 +15,22 @@ set -e
 
 : readonly ${RABBITMQ_ENABLED_PLUGINS:=rabbitmq_management,rabbitmq_management_agent}
 
+: ${SKIP_AUTO_CONFIG:=false}
 
-log::m-info "Writing rabbitmq.config ..."
-tee /etc/rabbitmq/rabbitmq.config <<EOF
+
+if [[ -e /config/rabbitmq.config ]]; then
+    ln -sf /config/rabbitmq.config /etc/rabbitmq/rabbitmq.config
+    SKIP_AUTO_CONFIG=true
+fi
+
+if [[ -f /config/.erlang.cookie ]]; then
+    ln -sf /config/.erlang.cookie ~/.erlang.cookie
+fi
+
+
+if [[ ! $SKIP_AUTO_CONFIG == true ]]; then
+    log::m-info "Writing rabbitmq.config ..."
+    tee /etc/rabbitmq/rabbitmq.config <<EOF
 [
     {rabbit, [
         {loopback_users, []},
@@ -31,6 +44,7 @@ tee /etc/rabbitmq/rabbitmq.config <<EOF
     {rabbitmq_management_agent, [{rates_mode, none}]}
 ].
 EOF
+fi
 
 
 log::m-info "Enabling plugins ..."

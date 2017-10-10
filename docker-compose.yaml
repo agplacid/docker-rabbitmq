@@ -1,14 +1,18 @@
-version: '2.1'
+version: '2.2'
 services:
   rabbitmq:
     container_name: rabbitmq
     hostname: rabbitmq.local
+    build:
+      context: .
+      args:
+        RABBITMQ_VERSION: 3.6.6
+    image: "${DOCKER_ORG:-telephoneorg}/rabbitmq:${TAG:-latest}"
     environment:
       ERLANG_COOKIE: test-cookie
-      RABBITMQ_USE_LONGNAME: 'true'
-    build: .
-    image: "callforamerica/rabbitmq:${TAG:-latest}"
-    # env_file: default.env
+      ERLANG_HOSTNAME: 'long'
+    ports:
+    - "15672:15672"
     networks:
       local:
         aliases:
