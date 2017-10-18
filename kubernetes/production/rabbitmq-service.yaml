@@ -1,16 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: rabbitmq-beta
+  name: rabbitmq
   labels:
     app: rabbitmq
-    set: alpha
     project: telephoneorg
     environment: production
 spec:
   selector:
     app: rabbitmq
-    set: beta
     project: telephoneorg
     environment: production
   ports:

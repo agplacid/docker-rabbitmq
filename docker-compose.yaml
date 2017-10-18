@@ -4,7 +4,7 @@ services:
     container_name: rabbitmq
     hostname: rabbitmq.local
     build:
-      context: .
+      context: images/rabbitmq
       args:
         RABBITMQ_VERSION: 3.6.6
     image: "${DOCKER_ORG:-telephoneorg}/rabbitmq:${TAG:-latest}"

@@ -19,6 +19,7 @@ COPY    build.sh /tmp/
 RUN     /tmp/build.sh
 
 COPY    entrypoint /
+COPY    rabbitmqctl /usr/local/sbin/
 
 ENV     ERL_MAX_PORTS 65536
 ENV     RABBITMQ_LOG_LEVEL info

@@ -1,14 +1,13 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: rabbitmq-alpha
+  name: rabbitmq
 spec:
   replicas: 1
   template:
     metadata:
       labels:
         app: rabbitmq
-        set: alpha
         project: telephoneorg
         environment: production
     spec:
@@ -74,7 +73,7 @@ spec:
         livenessProbe:
           exec:
             command: ["rabbitmqctl", "node_health_check", "|", "grep", "-q", "'^Health check passed'"]
-          initialDelaySeconds: 20
+          initialDelaySeconds: 10
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
