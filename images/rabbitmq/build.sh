@@ -40,13 +40,15 @@ export RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS="-kernel inet_dist_listen_min 11500 i
 EOF
 
 
-log::m-info "Adding app init to bash profile ..."
+log::m-info "Adding app init to entrypoint ..."
 tee /etc/entrypoint.d/50-${APP}-init <<'EOF'
 # write the erlang cookie
 erlang-cookie write
 
 # ref: http://erlang.org/doc/apps/erts/crash_dump.html
 erlang::set-erl-dump
+
+fixattrs
 EOF
 
 
@@ -57,6 +59,13 @@ tee /etc/profile.d/60-${APP}-long-name.sh <<'EOF'
 if [[ $USE_LONG_HOSTNAME == true || $ERLANG_HOSTNAME == 'long' || $KUBE_HOSTNAME == 'long' ]]; then
     export RABBITMQ_USE_LONGNAME=true
 fi
+EOF
+
+
+tee /etc/fixattrs.d/40-${APP}-own-state-dirs <<EOF
+$HOME true $USER:$USER 0775 0775
+$HOME/.erlang.cookie false $USER:$USER 0600 0755
+$HOME/mnesia true $USER:$USER 0777 0777
 EOF
 
 
