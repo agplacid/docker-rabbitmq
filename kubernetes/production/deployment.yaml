@@ -4,6 +4,12 @@ metadata:
   name: rabbitmq
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
   template:
     metadata:
       labels:
@@ -35,17 +41,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: rabbitmq
-              key: rabbitmq.user
+              key: user
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: rabbitmq
-              key: rabbitmq.pass
+              key: pass
         - name: ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
               name: erlang
-              key: erlang.cookie
+              key: cookie
         ports:
         - name: amqp
           protocol: TCP

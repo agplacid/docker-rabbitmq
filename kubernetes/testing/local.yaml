@@ -11,8 +11,8 @@ metadata:
     environment: testing
 type: Opaque
 data:
-  rabbitmq.pass: RVZCNklCQVhWMTlUWEtlQWZ4dWRUQkk0RVk3dzljaWk=
-  rabbitmq.user: Y29sbGFib3JhdGU=
+  pass: RVZCNklCQVhWMTlUWEtlQWZ4dWRUQkk0RVk3dzljaWk=
+  user: Y29sbGFib3JhdGU=
 ---
 apiVersion: v1
 kind: Secret
@@ -24,7 +24,7 @@ metadata:
     environment: testing
 type: Opaque
 data:
-  erlang.cookie: WlgyZVA4Umo4cnVmUjVJbjNnWGV1akhYNllseEREbnRyd3ZROE5kcGd3OXFOQjZ5UFhPUWhxNFF4bEc0WnZaQQ==
+  cookie: WlgyZVA4Umo4cnVmUjVJbjNnWGV1akhYNllseEREbnRyd3ZROE5kcGd3OXFOQjZ5UFhPUWhxNFF4bEc0WnZaQQ==
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -66,6 +66,12 @@ metadata:
     environment: testing
 spec:
   replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 5
   template:
     metadata:
       labels:
@@ -97,17 +103,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: rabbitmq
-              key: rabbitmq.user
+              key: user
         - name: RABBITMQ_DEFAULT_PASS
           valueFrom:
             secretKeyRef:
               name: rabbitmq
-              key: rabbitmq.pass
+              key: pass
         - name: ERLANG_COOKIE
           valueFrom:
             secretKeyRef:
               name: erlang
-              key: erlang.cookie
+              key: cookie
         ports:
         - name: amqp
           containerPort: 5672
