@@ -9,7 +9,7 @@ services:
         RABBITMQ_VERSION: 3.6.6
     image: "${DOCKER_ORG:-telephoneorg}/rabbitmq:${TAG:-latest}"
     environment:
-      ERLANG_COOKIE: test-cookie
+      ERLANG_COOKIE: change-me
       ERLANG_HOSTNAME: 'long'
       RABBITMQ_HOSTS=rabbitmq
       RABBITMQ_USER=guest
