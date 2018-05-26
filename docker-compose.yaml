@@ -1,4 +1,4 @@
-version: '2.2'
+version: '3'
 services:
   rabbitmq:
     container_name: rabbitmq
@@ -11,8 +11,12 @@ services:
     environment:
       ERLANG_COOKIE: test-cookie
       ERLANG_HOSTNAME: 'long'
+      RABBITMQ_HOSTS=rabbitmq
+	    RABBITMQ_USER=guest
+	    RABBITMQ_PASS=guest 
     ports:
     - "15672:15672"
+    - "5672:5672"
     networks:
       local:
         aliases:
