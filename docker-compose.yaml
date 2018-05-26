@@ -12,8 +12,8 @@ services:
       ERLANG_COOKIE: test-cookie
       ERLANG_HOSTNAME: 'long'
       RABBITMQ_HOSTS=rabbitmq
-	    RABBITMQ_USER=guest
-	    RABBITMQ_PASS=guest 
+      RABBITMQ_USER=guest
+      RABBITMQ_PASS=guest 
     ports:
     - "15672:15672"
     - "5672:5672"
